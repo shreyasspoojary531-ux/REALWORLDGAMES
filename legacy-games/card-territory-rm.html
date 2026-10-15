@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rummy Market</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --blue: #d99a3f; --blue-bright: #ffcf7a; --magenta: #b23a2f; --magenta-bright: #e8776b; --gold: #ffd23f;
+    --bg0: #1c0d08; --panel: rgba(40,22,12,0.75); --panel-border: rgba(217,154,63,0.32);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background: radial-gradient(circle at 20% 0%, rgba(140,60,20,0.18), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(120,20,15,0.16), transparent 45%),
+      radial-gradient(ellipse at 50% -10%, #3a1a10 0%, var(--bg0) 60%);
+    font-family:'Space Grotesk', sans-serif; color:#f3e6d6; -webkit-tap-highlight-color: transparent;
+  }
+  #app{ width:100%; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:12px; }
+  .screen{ width:min(600px,97vw); display:flex; flex-direction:column; gap:12px; }
+  .hidden{ display:none !important; }
+
+  @keyframes floatIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes cardPopIn{ 0%{ transform:scale(0.4) translateY(14px); opacity:0;} 60%{ transform:scale(1.06) translateY(-2px); opacity:1;} 100%{ transform:scale(1) translateY(0); opacity:1;} }
+  .profile-card, .currency-bar, .mode-card, .quick-grid{ animation: floatIn 0.5s ease both; }
+  .currency-bar{ animation-delay:0.03s; }
+  .quick-grid{ animation-delay:0.22s; }
+
+  .logo{ font-family:'Poppins', sans-serif; font-weight:800; font-size:22px; letter-spacing:1px; color: var(--blue-bright); text-shadow:0 2px 6px rgba(0,0,0,0.5); text-align:center;}
+  .logo span{ color: var(--magenta-bright); text-shadow:0 0 12px rgba(178,58,47,0.9), 0 0 30px rgba(178,58,47,0.4); }
+
+  .btn{ font-family:'Space Grotesk',sans-serif; background: rgba(217,154,63,0.06); border:1px solid var(--panel-border); color:#dff7ff; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; letter-spacing:0.3px; transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
+  .btn:hover{ border-color:var(--blue); box-shadow:0 0 14px rgba(217,154,63,0.35); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0px) scale(.97); }
+  .btn.primary{ background:linear-gradient(135deg, var(--blue), var(--magenta)); color:#03060c; border:none; font-weight:700; box-shadow:0 4px 20px rgba(217,154,63,0.35); }
+  .btn.icon{ padding:8px 10px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; box-shadow:none; transform:none; }
+
+  .profile-card{ display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid rgba(217,154,63,0.2); border-radius:14px; padding:12px 14px; }
+  .avatar{ width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0c2136,#1a3a55); display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid rgba(217,154,63,0.35); flex:none; }
+  .profile-info{ flex:1; min-width:0; }
+  .profile-name{ font-size:13px; font-weight:600; }
+  .rank-line{ display:flex; align-items:center; gap:6px; font-size:11px; opacity:0.85; margin-top:2px; }
+  .progress-track{ height:5px; border-radius:4px; background:rgba(255,255,255,0.08); margin-top:6px; overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--blue),var(--magenta)); }
+
+  .currency-bar{ display:flex; gap:8px; }
+  .cur-pill{ flex:1; display:flex; align-items:center; justify-content:center; gap:6px; background:var(--panel); border:1px solid rgba(217,154,63,0.18); border-radius:10px; padding:9px 6px; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; }
+
+  .section-title{ font-size:11px; letter-spacing:1.5px; opacity:0.6; text-transform:uppercase; margin:2px 2px -2px; }
+
+  .mode-card{ display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid rgba(217,154,63,0.18); border-radius:14px; padding:13px 14px; cursor:pointer; transition:all .15s ease; }
+  .mode-card:hover{ border-color:var(--blue); box-shadow:0 0 18px rgba(217,154,63,0.2); }
+  .mode-card:active{ transform:scale(0.97); }
+  .mode-card .mi{ font-size:24px; flex:none; width:36px; text-align:center; }
+  .mode-card .mt{ flex:1; }
+  .mode-card .mt .n{ font-size:13.5px; font-weight:700; }
+  .mode-card .mt .d{ font-size:11px; opacity:0.65; margin-top:1px; }
+  .mode-card .tag{ font-size:9px; padding:3px 7px; border-radius:6px; background:rgba(217,154,63,0.15); border:1px solid rgba(217,154,63,0.3); letter-spacing:0.4px; }
+
+  .quick-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .quick-btn{ display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--panel); border:1px solid rgba(217,154,63,0.15); border-radius:12px; padding:10px 2px; cursor:pointer; font-size:9px; letter-spacing:0.3px; opacity:0.85; transition:all .15s ease; }
+  .quick-btn:hover{ border-color:var(--blue); opacity:1; box-shadow:0 0 12px rgba(217,154,63,0.2); }
+  .quick-btn:active{ transform:scale(0.94); }
+  .quick-btn .ic{ font-size:19px; }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .topbar-btns{ display:flex; gap:6px; }
+  .table-wrap{ position:relative; width:100%; aspect-ratio:3/4; border-radius:22px; overflow:hidden; box-shadow:0 20px 70px rgba(0,0,0,0.7), inset 0 0 60px rgba(0,0,0,0.5); display:flex; flex-direction:column; border:9px solid; border-image: linear-gradient(155deg,#8a6234,#4a3016 30%,#7a5228 55%,#3a2410 80%,#8a6234) 1; box-sizing:border-box; }
+  .table-wrap::after{ content:''; position:absolute; inset:0; pointer-events:none; border-radius:14px; box-shadow: inset 0 3px 10px rgba(0,0,0,0.55), inset 0 0 2px rgba(255,220,150,0.25); z-index:7; }
+  canvas{ width:100%; height:100%; display:block; position:absolute; inset:0; }
+
+  .table-top{ position:relative; flex:1; }
+  .hud-msg{ position:absolute; top:8px; left:50%; transform:translate(-50%,0); background:rgba(3,8,16,0.75); border:1px solid var(--panel-border); padding:6px 16px; border-radius:20px; font-size:11.5px; letter-spacing:0.3px; opacity:0; transition:opacity .3s ease; pointer-events:none; white-space:nowrap; color: var(--blue-bright); z-index:8;}
+  .hud-msg.show{ opacity:1; }
+
+  .pile-zone{ position:absolute; top:44%; left:50%; transform:translate(-50%,-50%); display:flex; gap:22px; z-index:5; }
+  .pile{ display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .pile-card{ width:58px; height:82px; border-radius:7px; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; transition:transform .12s ease; }
+  .pile-card:active{ transform:scale(0.93); }
+  .pile-card.stock{ background:linear-gradient(135deg,#7a1f1f,#3a0d0d); border:2px solid rgba(255,255,255,0.25); }
+  .pile-card.stock::after{ content:'🂠'; font-size:26px; opacity:0.55; }
+  .pile-card.discard{ background:#f6f1e4; color:#1a1a1a; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:15px; flex-direction:column; border:2px solid rgba(0,0,0,0.15); }
+  .pile-card.discard.empty{ background:rgba(255,255,255,0.05); border:2px dashed rgba(255,255,255,0.2); color:rgba(255,255,255,0.3); font-size:10px; }
+  .pile-label{ font-size:9px; opacity:0.6; letter-spacing:0.5px; text-transform:uppercase; }
+
+  .ai-zone{ position:absolute; top:14px; left:0; right:0; display:flex; justify-content:center; gap:10px; z-index:5; }
+  .ai-card{ display:flex; flex-direction:column; align-items:center; gap:4px; background:rgba(3,8,16,0.5); border:1px solid var(--panel-border); border-radius:10px; padding:8px 12px; }
+  .ai-card.active{ border-color:var(--gold); box-shadow:0 0 14px rgba(255,210,63,0.4); }
+  .ai-avatar{ font-size:20px; }
+  .ai-count{ font-size:10px; font-family:'JetBrains Mono',monospace; opacity:0.8; }
+
+  .hand-zone{ background:rgba(3,8,16,0.55); border-top:1px solid var(--panel-border); padding:10px 8px; display:flex; flex-direction:column; gap:8px; }
+  .hand-scroll{ display:flex; gap:6px; overflow-x:auto; padding:6px 2px 2px; min-height:88px; }
+  .hand-scroll::-webkit-scrollbar{ height:4px; }
+  .playing-card{ flex:none; width:52px; height:76px; border-radius:6px; background:linear-gradient(150deg,#fffdf7 0%,#f8f2e2 55%,#efe6d0 100%); display:block; padding:0; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:9.5px; cursor:pointer; box-shadow:0 1px 0 rgba(255,255,255,0.6) inset, 0 4px 10px rgba(0,0,0,0.45); transition:transform .12s ease, box-shadow .12s ease; border:1px solid rgba(0,0,0,0.15); position:relative; overflow:hidden; animation: cardPopIn 0.3s cubic-bezier(.2,.8,.3,1.1); }
+  .playing-card::after{ content:''; position:absolute; inset:0; background:linear-gradient(120deg, rgba(255,255,255,0.45), rgba(255,255,255,0) 40%); pointer-events:none; }
+  .playing-card.selected{ transform:translateY(-14px); border-color:var(--gold); box-shadow:0 0 14px rgba(255,210,63,0.6), 0 4px 10px rgba(0,0,0,0.45); }
+  .playing-card .corner{ position:absolute; display:flex; flex-direction:column; align-items:center; line-height:1; }
+  .playing-card .corner.tl{ top:3px; left:3px; }
+  .playing-card .corner.br{ bottom:3px; right:3px; transform:rotate(180deg); }
+  .playing-card .corner .rk{ font-size:10px; }
+  .playing-card .corner .st{ font-size:8px; }
+  .playing-card .pip{ position:absolute; font-size:11px; font-family:sans-serif; transform:translate(-50%,-50%); }
+  .playing-card .center-big{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:22px; font-family:sans-serif; }
+  .playing-card .face-box{ position:absolute; top:20%; left:22%; right:22%; bottom:20%; border:1px solid currentColor; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
+  .playing-card .face-box .fl{ font-family:'Poppins',sans-serif; font-weight:700; font-size:13px; }
+  .playing-card .face-box .fs{ font-size:9px; font-family:sans-serif; }
+  .playing-card.grouped{ box-shadow:0 0 0 2px var(--gold) inset, 0 4px 10px rgba(0,0,0,0.45); }
+
+  .hand-actions{ display:flex; gap:6px; }
+  .hand-actions .btn{ flex:1; font-size:11px; padding:9px 4px; }
+
+  .winner-banner{ position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:rgba(2,4,9,0.88); border-radius:16px 16px 0 0; opacity:0; pointer-events:none; transition:opacity .4s ease; flex-direction:column; gap:12px; text-align:center; padding:20px; }
+  .winner-banner.show{ opacity:1; pointer-events:all; }
+  .winner-banner h2{ font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; margin:0; color: var(--gold); text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 0 22px rgba(255,210,63,0.5); animation: trophyPulse 1.6s ease-in-out infinite; }
+  @keyframes trophyPulse{ 0%,100%{ text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 0 18px rgba(255,210,63,0.4);} 50%{ text-shadow:0 2px 8px rgba(0,0,0,0.6), 0 0 32px rgba(255,210,63,0.75);} }
+  .reward-line{ font-family:'JetBrains Mono',monospace; font-size:14px; }
+  .winner-btns{ display:flex; gap:8px; }
+
+  .footer-hint{ font-size:10.5px; opacity:0.45; letter-spacing:0.3px; text-align:center; }
+
+  .modal-overlay{ position:fixed; inset:0; z-index:50; background:radial-gradient(ellipse at 50% 30%, rgba(0,60,90,0.35), rgba(2,4,9,0.94)); display:flex; align-items:center; justify-content:center; backdrop-filter: blur(4px); padding:14px; }
+  .modal{ width:min(440px, 92vw); max-height:86vh; overflow-y:auto; background:linear-gradient(160deg, rgba(6,16,28,0.96), rgba(2,5,10,0.98)); border:1px solid var(--panel-border); border-radius:18px; padding:24px 22px; box-shadow:0 30px 90px rgba(0,0,0,0.7), 0 0 70px rgba(217,154,63,0.1); text-align:center; }
+  .modal h1{ font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; margin:0 0 4px; color: var(--blue-bright); }
+  .modal p.sub{ font-size:12px; opacity:0.6; margin:0 0 18px; }
+  .rules-body{ text-align:left; font-size:13px; line-height:1.6; opacity:0.85; }
+  .rules-body h3{ font-size:12px; letter-spacing:1px; color:var(--blue-bright); margin:16px 0 6px; text-transform:uppercase; }
+  .rules-body h3:first-child{ margin-top:0; }
+
+  .slider-row{ display:flex; align-items:center; gap:10px; margin:12px 0; text-align:left; }
+  .slider-row label{ flex:0 0 108px; font-size:12px; opacity:0.85; }
+  .slider-row input[type=range]{ flex:1; accent-color:var(--blue); }
+  .slider-row .val{ width:32px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:11px; opacity:0.7; }
+  .settings-section-title{ font-size:11px; letter-spacing:1px; color:var(--magenta-bright); text-transform:uppercase; margin:18px 0 4px; text-align:left; }
+  .settings-section-title:first-of-type{ margin-top:0; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin:10px 0; }
+  .toggle-row label{ font-size:12px; opacity:0.85; }
+  .switch{ position:relative; width:38px; height:20px; flex:none; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch .sl{ position:absolute; inset:0; background:rgba(255,255,255,0.15); border-radius:20px; cursor:pointer; transition:.2s; }
+  .switch .sl:before{ content:""; position:absolute; width:14px; height:14px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .sl{ background:var(--blue); }
+  .switch input:checked + .sl:before{ transform:translateX(18px); }
+
+  .theme-grid{ display:flex; gap:10px; margin:14px 0; }
+  .theme-swatch{ flex:1; border-radius:12px; padding:14px 6px; cursor:pointer; border:1px solid var(--panel-border); display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .theme-swatch.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
+  .theme-dots{ display:flex; gap:5px; }
+  .theme-dots span{ width:14px; height:14px; border-radius:50%; }
+  .theme-swatch .l{ font-size:10px; opacity:0.75; }
+
+  .shop-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px; }
+  .shop-item{ background:rgba(217,154,63,0.04); border:1px solid rgba(217,154,63,0.15); border-radius:10px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .shop-item.equipped{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
+  .shop-item .n{ font-size:11px; }
+  .shop-item .p{ font-size:10px; opacity:0.7; font-family:'JetBrains Mono',monospace; }
+  .shop-item .btn{ width:100%; margin-top:2px; }
+  .tabbar{ display:flex; gap:6px; margin-bottom:14px; }
+  .tab{ flex:1; padding:8px; border-radius:8px; border:1px solid var(--panel-border); background:rgba(217,154,63,0.03); font-size:11.5px; cursor:pointer; }
+  .tab.active{ border-color:var(--blue); background:rgba(217,154,63,0.1); }
+  .placeholder-note{ font-size:11px; opacity:0.55; background:rgba(255,210,63,0.06); border:1px solid rgba(255,210,63,0.2); border-radius:8px; padding:8px 10px; margin-top:14px; text-align:left; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<div class="screen" id="homeScreen">
+  <div style="display:flex;align-items:center;justify-content:center;position:relative;">
+    <div class="logo">RUMMY <span>MARKET</span></div>
+    <button class="btn icon" id="quickMuteBtn" style="position:absolute;right:0;">🔊</button>
+  </div>
+
+  <div class="profile-card">
+    <div class="avatar" id="avatarIcon">🧺</div>
+    <div class="profile-info">
+      <div class="profile-name" id="profileName">Guest</div>
+      <div class="rank-line"><span id="rankIcon">🥉</span><span id="rankName">Rookie</span></div>
+      <div class="progress-track"><div class="progress-fill" id="rankProgress" style="width:10%;"></div></div>
+    </div>
+  </div>
+
+  <div class="currency-bar">
+    <div class="cur-pill">💰 <span id="coinCount">1000</span></div>
+    <div class="cur-pill">💎 <span id="gemCount">0</span></div>
+  </div>
+
+  <div class="section-title">Play</div>
+  <div class="mode-card" id="playBtn">
+    <div class="mi">🃏</div>
+    <div class="mt"><div class="n">Solo Table</div><div class="d">13-card rummy · 2 sequences (1 pure) to declare</div></div>
+    <div class="tag">PLAY</div>
+  </div>
+  <div class="mode-card" id="onlineCard">
+    <div class="mi">🌐</div>
+    <div class="mt"><div class="n">Multiplayer Table</div><div class="d">Room preview — needs a live server to seat real players</div></div>
+    <div class="tag">PREVIEW</div>
+  </div>
+
+  <div class="section-title">More</div>
+  <div class="quick-grid">
+    <div class="quick-btn" id="shopBtn"><div class="ic">🛒</div>Shop</div>
+    <div class="quick-btn" id="settingsBtn"><div class="ic">⚙️</div>Settings</div>
+    <div class="quick-btn" id="rulesBtn"><div class="ic">📖</div>Rules</div>
+    <div class="quick-btn" id="statsBtn"><div class="ic">📊</div>Stats</div>
+  </div>
+  <div class="footer-hint">Part of the Indoor Games Vault · Card Territory</div>
+</div>
+
+<div class="screen hidden" id="tableScreen">
+  <div class="topbar">
+    <button class="btn icon" id="backBtn">←</button>
+    <div class="logo" style="font-size:16px;">RUMMY</div>
+    <div class="topbar-btns">
+      <button class="btn icon" id="tableMuteBtn">🔊</button>
+      <button class="btn icon" id="tableRulesBtn">📖</button>
+    </div>
+  </div>
+  <div class="cur-pill" style="width:100%;">💰 <span id="tableCoinCount">1000</span></div>
+
+  <div class="table-wrap" id="tableWrap">
+    <div class="table-top">
+      <canvas id="stage"></canvas>
+      <div class="hud-msg" id="hudMsg">Your turn — draw a card</div>
+      <div class="ai-zone">
+        <div class="ai-card" id="aiCard">
+          <div class="ai-avatar">🤖</div>
+          <div class="ai-count" id="aiCountLabel">13 cards</div>
+        </div>
+      </div>
+      <div class="pile-zone">
+        <div class="pile">
+          <div class="pile-card stock" id="stockPile"></div>
+          <div class="pile-label">Stock (<span id="stockCount">80</span>)</div>
+        </div>
+        <div class="pile">
+          <div class="pile-card discard empty" id="discardPile">empty</div>
+          <div class="pile-label">Discard</div>
+        </div>
+      </div>
+      <div class="winner-banner" id="winnerBanner">
+        <h2 id="winnerTitle">You Win!</h2>
+        <div class="reward-line" id="winnerReward">+120 💰</div>
+        <div class="winner-btns">
+          <button class="btn primary" id="playAgainBtn">Play Again</button>
+          <button class="btn" id="winnerHomeBtn">Home</button>
+        </div>
+      </div>
+    </div>
+    <div class="hand-zone">
+      <div class="hand-scroll" id="handScroll"></div>
+      <div class="hand-actions">
+        <button class="btn" id="sortBtn">Sort Hand</button>
+        <button class="btn" id="discardBtn" disabled>Discard Selected</button>
+        <button class="btn primary" id="declareBtn">Declare</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer-hint">Tap stock or discard pile to draw, then tap a card and Discard</div>
+</div>
+
+<div class="modal-overlay hidden" id="rulesOverlay">
+  <div class="modal">
+    <h1>How to Play</h1>
+    <p class="sub">13-Card Rummy — form sets and sequences</p>
+    <div class="rules-body">
+      <h3>Goal</h3>
+      <p>Arrange all 13 cards into valid groups, then declare before your opponent.</p>
+      <h3>Groups</h3>
+      <p><b>Sequence</b> — 3+ consecutive cards, same suit. <b>Set</b> — 3 or 4 cards of the same rank, different suits.</p>
+      <h3>To Declare</h3>
+      <p>You need at least two sequences, and every one of your 13 cards must belong to a valid group.</p>
+      <h3>Turn</h3>
+      <p>Draw one card from the stock pile or the discard pile, then discard one card from your hand. Tap "Sort Hand" to group by suit for easier planning.</p>
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:16px;" id="closeRulesBtn">Got it</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="settingsOverlay">
+  <div class="modal">
+    <h1>Settings</h1>
+    <p class="sub">Sound, table felt, and profile</p>
+    <div class="settings-section-title">Audio</div>
+    <div class="slider-row"><label>Sound Effects</label><input type="range" id="sfxSlider" min="0" max="100" value="80"><div class="val" id="sfxVal">80</div></div>
+    <div class="toggle-row"><label>Haptics</label><label class="switch"><input type="checkbox" id="hapticToggle" checked><span class="sl"></span></label></div>
+    <div class="settings-section-title">Table Felt</div>
+    <div class="theme-grid" id="tableThemeGrid"></div>
+    <div class="settings-section-title">Profile</div>
+    <div class="slider-row"><label>Display Name</label><input type="text" id="nameInput" style="flex:1;padding:8px 10px;border-radius:8px;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);color:#f3e6d6;font-size:12px;"></div>
+    <button class="btn primary" style="width:100%;margin-top:16px;" id="closeSettingsBtn">Save & Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="shopOverlay">
+  <div class="modal">
+    <h1>Card Shop</h1>
+    <p class="sub">Spend coins & diamonds on cosmetics</p>
+    <div class="tabbar">
+      <div class="tab active" data-tab="backs">Card Backs</div>
+      <div class="tab" data-tab="felt">Table Felts</div>
+    </div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <div class="placeholder-note">Cosmetic only — card backs and table felts change look, not odds.</div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="statsOverlay">
+  <div class="modal">
+    <h1>Your Stats</h1>
+    <p class="sub">Session history</p>
+    <div class="rules-body" id="statsBody"></div>
+    <button class="btn primary" style="width:100%;margin-top:16px;" id="closeStatsBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="multiplayerOverlay">
+  <div class="modal">
+    <h1>Multiplayer Table</h1>
+    <p class="sub">Seat up to 4 players at one table</p>
+    <button class="btn primary" style="width:100%;margin-bottom:8px;" id="customRoomBtn">Create Custom Room</button>
+    <button class="btn" style="width:100%;" id="randomMatchBtn">Find Random Table</button>
+    <button class="btn" style="width:100%;margin-top:14px;" id="closeMultiplayerBtn">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="lobbyOverlay">
+  <div class="modal">
+    <h1 id="lobbyTitle">CUSTOM ROOM</h1>
+    <p class="sub" id="lobbySub">Share your ID or enter a friend's to invite them.</p>
+    <div id="lobbyIdRow" style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+      <div style="flex:1;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);border-radius:9px;padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:13px;text-align:left;">ID: <span id="myPlayerId"></span></div>
+      <button class="btn" id="copyIdBtn">Copy</button>
+    </div>
+    <div id="inviteRow" style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="text" id="inviteIdInput" placeholder="Friend's ID, e.g. RM-482913" style="flex:1;padding:9px 10px;border-radius:9px;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);color:#f3e6d6;font-family:'JetBrains Mono',monospace;font-size:12px;">
+      <button class="btn primary" id="sendInviteBtn">Invite</button>
+    </div>
+    <div class="section-title" style="margin-bottom:8px;">Seats (<span id="lobbyCount">1</span>/4)</div>
+    <div id="lobbySlots" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+    <div class="placeholder-note">Real invites and matchmaking need a live server (accounts, room state, WebSocket sync) to seat real players — this is the ready-made front end for it.</div>
+    <button class="btn" style="width:100%;margin-top:8px;" id="closeLobbyBtn">Leave Room</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+(() => {
+"use strict";
+
+// ================= Audio =================
+let actx = null, sfxVol = 0.8, muted = false;
+let hapticsOn = true;
+function haptic(ms=10){ if(hapticsOn && navigator.vibrate) { try{ navigator.vibrate(ms); }catch(e){} } }
+function ensureAudio(){ if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(actx && actx.state==='suspended'){ actx.resume(); } }
+function tone(freq, dur, type='sine', vol=1, delay=0){
+  if(!actx || muted) return;
+  const t0 = actx.currentTime + delay;
+  const osc = actx.createOscillator(); const gain = actx.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(vol*sfxVol*0.35, t0+0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+  osc.connect(gain); gain.connect(actx.destination);
+  osc.start(t0); osc.stop(t0+dur+0.02);
+}
+function playUIClick(){ tone(720,0.05,'sine',0.25); }
+function makeNoiseBuffer(duration, decay=3){
+  const n = Math.max(1,Math.floor(actx.sampleRate*duration));
+  const buf = actx.createBuffer(1,n,actx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i] = (Math.random()*2-1) * Math.pow(1-i/n, decay); }
+  return buf;
+}
+function playCardTap(vol=0.5, delay=0, freq=3200){
+  if(!actx||muted) return;
+  const t0 = actx.currentTime+delay;
+  const src = actx.createBufferSource(); src.buffer = makeNoiseBuffer(0.045,2.5);
+  const bp = actx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=freq+Math.random()*900; bp.Q.value=1.2;
+  const g = actx.createGain(); g.gain.setValueAtTime(sfxVol*vol,t0); g.gain.exponentialRampToValueAtTime(0.001,t0+0.05);
+  src.connect(bp); bp.connect(g); g.connect(actx.destination); src.start(t0);
+}
+function playCardSlide(vol=0.4, delay=0){
+  if(!actx||muted) return;
+  const t0 = actx.currentTime+delay;
+  const src = actx.createBufferSource(); src.buffer = makeNoiseBuffer(0.11,1.8);
+  const hp = actx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1400;
+  const g = actx.createGain(); g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(sfxVol*vol,t0+0.02); g.gain.exponentialRampToValueAtTime(0.001,t0+0.12);
+  src.connect(hp); hp.connect(g); g.connect(actx.destination); src.start(t0);
+}
+function playCardDeal(){ playCardSlide(0.32); playCardTap(0.42,0.055); haptic(8); }
+function playDraw(){ playCardSlide(0.3); playCardTap(0.38,0.05,2800); haptic(8); }
+function playDiscard(){ playCardTap(0.45,0,2400); haptic(6); }
+function playShuffle(){ for(let i=0;i<7;i++){ playCardTap(0.16, i*0.05, 2600+Math.random()*1600); } }
+function playWin(){ [0,0.1].forEach((d,i)=>tone(660+i*220,0.22,'sine',0.35,d)); haptic([15,40,15]); }
+function playLose(){ tone(220,0.3,'sine',0.3); tone(165,0.35,'sine',0.22,0.09); haptic(30); }
+function playInvalid(){ playCardTap(0.5,0,900); tone(140,0.25,'sine',0.28,0.04); haptic([20,20,20]); }
+
+// ================= Meta =================
+const RANKS = [
+  { name:'Rookie', min:0, icon:'🥉' },{ name:'Bronze', min:500, icon:'🥈' },{ name:'Silver', min:2000, icon:'🥇' },
+  { name:'Gold', min:6000, icon:'🏅' },{ name:'Diamond', min:15000, icon:'💎' },{ name:'Heroic', min:35000, icon:'🔥' },
+];
+const meta = { name:'Guest_'+Math.floor(1000+Math.random()*9000), coins:1000, gems:0, lifetimeWinnings:0, handsPlayed:0, handsWon:0, bestStreak:0, curStreak:0 };
+function currentRankIdx(){ let idx=0; for(let i=0;i<RANKS.length;i++){ if(meta.lifetimeWinnings>=RANKS[i].min) idx=i; } return idx; }
+// ---- Shared vault (persists coins/gems/name/rank across all Card Territory games) ----
+const VAULT_KEY = 'cardTerritoryVault';
+function loadVault(){
+  try{
+    const raw = localStorage.getItem(VAULT_KEY);
+    if(!raw) return;
+    const v = JSON.parse(raw);
+    if(typeof v.coins==='number') meta.coins = v.coins;
+    if(typeof v.gems==='number') meta.gems = v.gems;
+    if(typeof v.lifetimeWinnings==='number') meta.lifetimeWinnings = v.lifetimeWinnings;
+    if(typeof v.name==='string' && v.name) meta.name = v.name;
+  }catch(e){}
+}
+function saveVault(){
+  try{
+    const raw = localStorage.getItem(VAULT_KEY);
+    const prev = raw ? JSON.parse(raw) : {};
+    localStorage.setItem(VAULT_KEY, JSON.stringify({
+      coins: meta.coins, gems: meta.gems, name: meta.name, lifetimeWinnings: meta.lifetimeWinnings,
+      games: { ...(prev.games||{}), rummy: { handsPlayed: meta.handsPlayed, handsWon: meta.handsWon, bestStreak: meta.bestStreak } }
+    }));
+  }catch(e){}
+}
+function refreshProfileUI(){
+  document.getElementById('profileName').textContent = meta.name;
+  const ri = currentRankIdx(); const r = RANKS[ri];
+  document.getElementById('rankIcon').textContent = r.icon;
+  document.getElementById('rankName').textContent = r.name;
+  const next = RANKS[ri+1];
+  const pct = next ? Math.min(100, ((meta.lifetimeWinnings-r.min)/(next.min-r.min))*100) : 100;
+  document.getElementById('rankProgress').style.width = pct+'%';
+  document.getElementById('coinCount').textContent = meta.coins;
+  document.getElementById('gemCount').textContent = meta.gems;
+  document.getElementById('tableCoinCount').textContent = meta.coins;
+  saveVault();
+}
+
+// ================= Card model =================
+const SUITS = ['♠','♥','♦','♣'];
+const RANKS_CARD = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const RVAL = {}; RANKS_CARD.forEach((r,i)=>RVAL[r]=i+1);
+function suitColor(s){ return (s==='♥'||s==='♦') ? '#c0392b' : '#1a1a1a'; }
+function makeCard(r,s,id){ return {r,s,id,col:suitColor(s)}; }
+const SUIT_PATHS = {
+  '♠': 'M12 2C12 2 4 9.5 4 15C4 18.31 6.69 21 10 21C10.86 21 11.68 20.81 12.41 20.47C12.11 21.71 11.11 22.62 9.8 23H14.2C12.89 22.62 11.89 21.71 11.59 20.47C12.32 20.81 13.14 21 14 21C17.31 21 20 18.31 20 15C20 9.5 12 2 12 2Z',
+  '♥': 'M12 21C12 21 3.5 14.5 3.5 8.5C3.5 5.46 5.96 3 9 3C10.54 3 11.94 3.77 12 5.06C12.06 3.77 13.46 3 15 3C18.04 3 20.5 5.46 20.5 8.5C20.5 14.5 12 21 12 21Z',
+  '♦': 'M12 2L20 12L12 22L4 12Z',
+  '♣': 'M12 3C13.66 3 15 4.34 15 6C15 6.35 14.93 6.68 14.82 7C16.03 7.19 17 8.24 17 9.5C17 10.88 15.88 12 14.5 12C13.85 12 13.26 11.75 12.82 11.34C13.2 11.94 13.5 12.94 13.5 14C13.5 14 13.5 15 12.8 16H15L16 22H8L9 16H11.2C10.5 15 10.5 14 10.5 14C10.5 12.94 10.8 11.94 11.18 11.34C10.74 11.75 10.15 12 9.5 12C8.12 12 7 10.88 7 9.5C7 8.24 7.97 7.19 9.18 7C9.07 6.68 9 6.35 9 6C9 4.34 10.34 3 12 3Z'
+};
+function suitIcon(suit, colorHex, sizePx){
+  return `<svg viewBox="0 0 24 24" width="${sizePx}" height="${sizePx}" style="display:block;"><path d="${SUIT_PATHS[suit]}" fill="${colorHex}"/></svg>`;
+}
+const PIP_LAYOUTS = {
+  '2':[[50,24,0],[50,76,1]],'3':[[50,24,0],[50,50,0],[50,76,1]],
+  '4':[[30,24,0],[70,24,0],[30,76,1],[70,76,1]],
+  '5':[[30,24,0],[70,24,0],[50,50,0],[30,76,1],[70,76,1]],
+  '6':[[30,24,0],[70,24,0],[30,50,0],[70,50,0],[30,76,1],[70,76,1]],
+  '7':[[30,20,0],[70,20,0],[50,35,0],[30,50,0],[70,50,0],[30,80,1],[70,80,1]],
+  '8':[[30,18,0],[70,18,0],[50,32,0],[30,46,0],[70,46,0],[50,68,1],[30,82,1],[70,82,1]],
+  '9':[[30,16,0],[70,16,0],[30,36,0],[70,36,0],[50,50,0],[30,64,1],[70,64,1],[30,84,1],[70,84,1]],
+  '10':[[30,14,0],[70,14,0],[50,24,0],[30,38,0],[70,38,0],[30,62,1],[70,62,1],[50,76,1],[30,86,1],[70,86,1]],
+};
+function cardFaceHTML(c){
+  const corner = `<div class="corner tl"><div class="rk">${c.r}</div>${suitIcon(c.s,c.col,9)}</div><div class="corner br"><div class="rk">${c.r}</div>${suitIcon(c.s,c.col,9)}</div>`;
+  if(c.r==='A'){ return corner + `<div class="center-big">${suitIcon(c.s,c.col,26)}</div>`; }
+  if(['J','Q','K'].includes(c.r)){ return corner + `<div class="face-box"><div class="fl">${c.r}</div>${suitIcon(c.s,c.col,12)}</div>`; }
+  const layout = PIP_LAYOUTS[c.r]||[];
+  const pips = layout.map(([x,y,flip])=>`<div class="pip" style="left:${x}%;top:${y}%;${flip?'transform:translate(-50%,-50%) rotate(180deg);':'transform:translate(-50%,-50%);'}">${suitIcon(c.s,c.col,10)}</div>`).join('');
+  return corner + pips;
+}
+function freshDeck(){
+  const deck = []; let id=0;
+  for(const s of SUITS){ for(const r of RANKS_CARD){ deck.push(makeCard(r,s,id++)); } }
+  for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+  return deck;
+}
+
+// ================= Meld validation =================
+// Returns {valid, groups} where groups is array of arrays of card, using ALL cards, with >=2 sequences.
+function validateRummyHand(cards){
+  const sorted = cards.slice();
+  function key(c){ return c.suit_rank; }
+  // Build candidate groups (as arrays of card objects) from full card list by id
+  function findGroups(remaining){
+    if(remaining.length===0) return [[]];
+    // pick card with smallest sort key to bound branching
+    const results = [];
+    const target = remaining[0];
+    // try sequences containing target: same suit, consecutive
+    const suitCards = remaining.filter(c=>c.s===target.s).sort((a,b)=>RVAL[a.r]-RVAL[b.r]);
+    for(let len=Math.min(6,suitCards.length); len>=3; len--){
+      for(let start=0; start+len<=suitCards.length; start++){
+        const seq = suitCards.slice(start,start+len);
+        // check consecutive & contains target
+        let consec = true;
+        for(let i=1;i<seq.length;i++){ if(RVAL[seq[i].r] !== RVAL[seq[i-1].r]+1) { consec=false; break; } }
+        if(!consec) continue;
+        if(!seq.includes(target)) continue;
+        const rest = remaining.filter(c=>!seq.includes(c));
+        const sub = findGroups(rest);
+        for(const s2 of sub){ results.push([{type:'seq',cards:seq}, ...s2]); }
+        if(results.length>40) return results;
+      }
+    }
+    // try sets containing target: same rank, distinct suit
+    const rankCards = remaining.filter(c=>c.r===target.r);
+    for(let len=Math.min(4,rankCards.length); len>=3; len--){
+      // choose combinations of size len from rankCards that include target
+      const others = rankCards.filter(c=>c!==target);
+      const combos = combinations(others, len-1);
+      for(const combo of combos){
+        const set = [target, ...combo];
+        const suitsUsed = new Set(set.map(c=>c.s));
+        if(suitsUsed.size !== set.length) continue;
+        const rest = remaining.filter(c=>!set.includes(c));
+        const sub = findGroups(rest);
+        for(const s2 of sub){ results.push([{type:'set',cards:set}, ...s2]); }
+        if(results.length>40) return results;
+      }
+    }
+    return results;
+  }
+  function combinations(arr, k){
+    if(k===0) return [[]];
+    if(arr.length < k) return [];
+    const [first, ...rest] = arr;
+    const withFirst = combinations(rest, k-1).map(c=>[first,...c]);
+    const withoutFirst = combinations(rest, k);
+    return [...withFirst, ...withoutFirst];
+  }
+  const allPartitions = findGroups(sorted);
+  for(const partition of allPartitions){
+    const seqCount = partition.filter(g=>g.type==='seq').length;
+    if(seqCount>=2){
+      return { valid:true, groups:partition };
+    }
+  }
+  return { valid:false, groups:null };
+}
+
+// ================= Card backs / felt (shop) =================
+const CARD_BACKS = [
+  { name:'Crimson', cost:0, grad:['#7a1f1f','#3a0d0d'] },{ name:'Royal Blue', cost:0, grad:['#1a3a6b','#0a1a35'] },
+  { name:'Emerald', cost:800, grad:['#155e3a','#0a2a1a'] },{ name:'Gold Foil', cost:2500, grad:['#8a6a1a','#3a2a08'] },
+];
+let unlockedBacks=[true,true,false,false]; let activeBackIdx=0;
+const FELT_THEMES = [
+  { name:'Amber Market', dots:['#6b4a12','#3a2708'], cost:0 },{ name:'Midnight Blue', dots:['#0e2b5b','#081a35'], cost:0 },
+  { name:'Crimson', dots:['#5b0e1e','#350810'], cost:1200 },
+];
+let unlockedFelts=[true,true,false]; let activeFeltIdx=0;
+
+// ================= Screens =================
+const homeScreen = document.getElementById('homeScreen');
+const tableScreen = document.getElementById('tableScreen');
+function showScreen(el){ [homeScreen,tableScreen].forEach(s=>s.classList.add('hidden')); el.classList.remove('hidden'); }
+function openModal(el){ el.classList.remove('hidden'); }
+function closeModal(el){ el.classList.add('hidden'); }
+document.querySelectorAll('.modal-overlay').forEach(ov=>{ ov.addEventListener('click',(e)=>{ if(e.target===ov) closeModal(ov); }); });
+
+document.getElementById('quickMuteBtn').addEventListener('click', ()=>{ ensureAudio(); muted=!muted; document.getElementById('quickMuteBtn').textContent=muted?'🔇':'🔊'; document.getElementById('tableMuteBtn').textContent=muted?'🔇':'🔊'; });
+document.getElementById('tableMuteBtn').addEventListener('click', ()=>{ ensureAudio(); muted=!muted; document.getElementById('quickMuteBtn').textContent=muted?'🔇':'🔊'; document.getElementById('tableMuteBtn').textContent=muted?'🔇':'🔊'; });
+document.getElementById('rulesBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); openModal(document.getElementById('rulesOverlay')); });
+document.getElementById('tableRulesBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); openModal(document.getElementById('rulesOverlay')); });
+document.getElementById('closeRulesBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); closeModal(document.getElementById('rulesOverlay')); });
+document.getElementById('settingsBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); document.getElementById('nameInput').value=meta.name; openModal(document.getElementById('settingsOverlay')); });
+document.getElementById('closeSettingsBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); const nm=document.getElementById('nameInput').value.trim(); if(nm) meta.name=nm; refreshProfileUI(); closeModal(document.getElementById('settingsOverlay')); });
+document.getElementById('sfxSlider').addEventListener('input',(e)=>{ sfxVol=e.target.value/100; document.getElementById('sfxVal').textContent=e.target.value; });
+document.getElementById('hapticToggle').addEventListener('change', (e)=>{ hapticsOn = e.target.checked; if(hapticsOn) haptic(10); });
+
+function renderTableThemeGrid(){
+  const grid = document.getElementById('tableThemeGrid'); grid.innerHTML='';
+  FELT_THEMES.forEach((t,i)=>{
+    const sw = document.createElement('div');
+    sw.className='theme-swatch'+(i===activeFeltIdx?' selected':'');
+    sw.innerHTML=`<div class="theme-dots"><span style="background:${t.dots[0]}"></span><span style="background:${t.dots[1]}"></span></div><div class="l">${t.name}${t.cost?(' · '+t.cost+'💰'):''}</div>`;
+    sw.addEventListener('click', ()=>{ ensureAudio(); playUIClick();
+      if(!unlockedFelts[i]){ if(meta.coins>=t.cost){ meta.coins-=t.cost; unlockedFelts[i]=true; refreshProfileUI(); } else { showToast('Not enough coins'); return; } }
+      activeFeltIdx=i; renderTableThemeGrid();
+    });
+    grid.appendChild(sw);
+  });
+}
+renderTableThemeGrid();
+
+function renderShop(tab){
+  const grid = document.getElementById('shopGrid'); grid.innerHTML='';
+  const list = tab==='felt'?FELT_THEMES:CARD_BACKS;
+  const unlocked = tab==='felt'?unlockedFelts:unlockedBacks;
+  const activeIdx = tab==='felt'?activeFeltIdx:activeBackIdx;
+  list.forEach((item,i)=>{
+    const div=document.createElement('div'); div.className='shop-item'+(i===activeIdx?' equipped':'');
+    const previewStyle = tab==='felt' ? `background:linear-gradient(135deg,${item.dots[0]},${item.dots[1]});border-radius:8px;width:40px;height:56px;` : `background:linear-gradient(135deg,${item.grad[0]},${item.grad[1]});border-radius:6px;width:40px;height:56px;border:2px solid rgba(255,255,255,0.2);`;
+    div.innerHTML = `<div style="${previewStyle}"></div><div class="n">${item.name}</div><div class="p">${item.cost===0?'Free':item.cost+' 💰'}</div>`;
+    const btn=document.createElement('button'); btn.className='btn'+(i===activeIdx?' primary':''); btn.textContent = unlocked[i]?(i===activeIdx?'Equipped':'Equip'):'Unlock';
+    btn.addEventListener('click', ()=>{ ensureAudio(); playUIClick();
+      if(!unlocked[i]){ if(meta.coins>=item.cost){ meta.coins-=item.cost; unlocked[i]=true; refreshProfileUI(); } else { showToast('Not enough coins'); return; } }
+      else { if(tab==='felt') activeFeltIdx=i; else activeBackIdx=i; }
+      renderShop(tab);
+    });
+    div.appendChild(btn); grid.appendChild(div);
+  });
+}
+document.getElementById('shopBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); renderShop('backs'); openModal(document.getElementById('shopOverlay')); });
+document.querySelectorAll('#shopOverlay .tab').forEach(tab=>{ tab.addEventListener('click', ()=>{ ensureAudio(); playUIClick(); document.querySelectorAll('#shopOverlay .tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); renderShop(tab.dataset.tab); }); });
+
+document.getElementById('statsBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  const wr = meta.handsPlayed?Math.round((meta.handsWon/meta.handsPlayed)*100):0;
+  document.getElementById('statsBody').innerHTML = `<p>Hands Played: <b>${meta.handsPlayed}</b></p><p>Hands Won: <b>${meta.handsWon}</b> (${wr}%)</p><p>Best Win Streak: <b>${meta.bestStreak}</b></p><p>Lifetime Winnings: <b>${meta.lifetimeWinnings} 💰</b></p>`;
+  openModal(document.getElementById('statsOverlay'));
+});
+document.getElementById('closeStatsBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); closeModal(document.getElementById('statsOverlay')); });
+document.getElementById('backBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); showScreen(homeScreen); refreshProfileUI(); });
+
+let toastTimer=null;
+function showToast(text, dur=2000){
+  let t = document.getElementById('globalToast');
+  if(!t){ t=document.createElement('div'); t.id='globalToast';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(3,8,16,0.9);border:1px solid var(--panel-border);color:#f3e6d6;padding:9px 18px;border-radius:20px;font-size:12.5px;z-index:200;opacity:0;transition:opacity .25s ease;pointer-events:none;text-align:center;max-width:90vw;';
+    document.body.appendChild(t);
+  }
+  t.textContent=text; t.style.opacity='1'; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.style.opacity='0';},dur);
+}
+
+// ================= Canvas felt =================
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * 2; canvas.height = rect.height * 2;
+  drawFelt();
+}
+let feltNoiseCanvas=null;
+function buildFeltNoise(){
+  const nc=document.createElement('canvas'); nc.width=180; nc.height=180;
+  const nctx=nc.getContext('2d'); const img=nctx.createImageData(180,180);
+  for(let i=0;i<img.data.length;i+=4){ const v=128+(Math.random()-0.5)*30; img.data[i]=v; img.data[i+1]=v; img.data[i+2]=v; img.data[i+3]=14; }
+  nctx.putImageData(img,0,0); feltNoiseCanvas=nc;
+}
+function drawFelt(){
+  const theme = FELT_THEMES[activeFeltIdx];
+  const W=canvas.width, H=canvas.height;
+  const g = ctx.createRadialGradient(W/2,H*0.4,40,W/2,H*0.5,W*0.85);
+  g.addColorStop(0, theme.dots[0]); g.addColorStop(0.72, theme.dots[1]); g.addColorStop(1,'rgba(0,0,0,0.55)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  if(!feltNoiseCanvas) buildFeltNoise();
+  const pat = ctx.createPattern(feltNoiseCanvas,'repeat');
+  ctx.save(); ctx.globalAlpha=0.5; ctx.fillStyle=pat; ctx.fillRect(0,0,W,H); ctx.restore();
+  const vg = ctx.createRadialGradient(W/2,H*0.45,W*0.25,W/2,H*0.45,W*0.75);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.45)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+}
+window.addEventListener('resize', resizeCanvas);
+
+// ================= Game state =================
+let deck = [], stockCount=0, discardPile=[], playerHand=[], aiHand=[];
+let selectedCardId=null, groupedMelds=null;
+let turn='player'; // player | ai
+let phase='draw'; // draw | discard
+let gameActive=false;
+
+function newGame(){
+  deck = freshDeck();
+  playerHand = deck.splice(0,13);
+  aiHand = deck.splice(0,13);
+  discardPile = [deck.pop()];
+  stockCount = deck.length;
+  selectedCardId=null; groupedMelds=null;
+  turn='player'; phase='draw'; gameActive=true;
+  meta.handsPlayed++;
+  renderAll();
+  hudMsg('Your turn — draw a card');
+}
+
+function sortHandArr(hand){
+  return hand.slice().sort((a,b)=> SUITS.indexOf(a.s)-SUITS.indexOf(b.s) || RVAL[a.r]-RVAL[b.r]);
+}
+
+function computeGroupHighlight(){
+  const res = validateRummyHand(playerHand);
+  if(res.valid){
+    const map = {};
+    res.groups.forEach((g,gi)=>{ g.cards.forEach(c=>{ map[c.id]=gi; }); });
+    groupedMelds = map;
+  } else { groupedMelds = null; }
+  return res.valid;
+}
+
+function renderHand(){
+  const el = document.getElementById('handScroll');
+  el.innerHTML = '';
+  playerHand.forEach(c=>{
+    const div = document.createElement('div');
+    div.className = 'playing-card' + (c.id===selectedCardId?' selected':'') + (groupedMelds && groupedMelds[c.id]!==undefined ? ' grouped':'');
+    div.style.color = c.col;
+    div.innerHTML = cardFaceHTML(c);
+    div.addEventListener('click', ()=>{
+      ensureAudio();
+      if(!gameActive || turn!=='player') return;
+      selectedCardId = (selectedCardId===c.id) ? null : c.id;
+      renderHand();
+      document.getElementById('discardBtn').disabled = !(selectedCardId!==null && phase==='discard');
+    });
+    el.appendChild(div);
+  });
+}
+
+function renderPiles(){
+  document.getElementById('stockCount').textContent = stockCount;
+  const dp = document.getElementById('discardPile');
+  if(discardPile.length){
+    const top = discardPile[discardPile.length-1];
+    dp.classList.remove('empty');
+    dp.style.color = top.col;
+    dp.style.flexDirection='column';
+    dp.innerHTML = `<div style="font-size:12px;font-weight:700;">${top.r}</div>${suitIcon(top.s, top.col, 18)}`;
+  } else {
+    dp.classList.add('empty'); dp.textContent='empty';
+  }
+}
+
+function renderAI(){
+  document.getElementById('aiCountLabel').textContent = aiHand.length + ' cards';
+  document.getElementById('aiCard').classList.toggle('active', turn==='ai');
+}
+
+function renderAll(){
+  renderHand(); renderPiles(); renderAI();
+  const canDeclare = computeGroupHighlight();
+  document.getElementById('declareBtn').disabled = !gameActive;
+  renderHand();
+}
+
+function hudMsg(text, ms=1600){
+  const el = document.getElementById('hudMsg'); el.textContent=text; el.classList.add('show');
+  clearTimeout(hudMsg._t); hudMsg._t = setTimeout(()=>el.classList.remove('show'), ms);
+}
+
+// ---- Player draw ----
+document.getElementById('stockPile').addEventListener('click', ()=>{
+  ensureAudio();
+  if(!gameActive || turn!=='player' || phase!=='draw') return;
+  if(deck.length===0){ showToast('Stock empty'); return; }
+  playDraw();
+  const c = deck.pop(); stockCount = deck.length; playerHand.push(c);
+  phase='discard'; renderAll(); hudMsg('Select a card to discard');
+});
+document.getElementById('discardPile').addEventListener('click', ()=>{
+  ensureAudio();
+  if(!gameActive || turn!=='player' || phase!=='draw') return;
+  if(discardPile.length===0) return;
+  playDraw();
+  const c = discardPile.pop(); playerHand.push(c);
+  phase='discard'; renderAll(); hudMsg('Select a card to discard');
+});
+document.getElementById('sortBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); playerHand = sortHandArr(playerHand); renderAll(); });
+
+document.getElementById('discardBtn').addEventListener('click', ()=>{
+  ensureAudio();
+  if(!gameActive || turn!=='player' || phase!=='discard' || selectedCardId===null) return;
+  playDiscard();
+  const idx = playerHand.findIndex(c=>c.id===selectedCardId);
+  const [c] = playerHand.splice(idx,1);
+  discardPile.push(c);
+  selectedCardId=null;
+  document.getElementById('discardBtn').disabled = true;
+  phase='draw'; turn='ai'; renderAll();
+  hudMsg("Opponent's turn...");
+  setTimeout(aiTurn, 900);
+});
+
+document.getElementById('declareBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  if(!gameActive || turn!=='player') return;
+  if(playerHand.length!==13){ showToast('Discard down to 13 cards first'); return; }
+  const res = validateRummyHand(playerHand);
+  if(res.valid){
+    endGame('player', 'valid');
+  } else {
+    playInvalid();
+    meta.coins = Math.max(0, meta.coins-50); refreshProfileUI();
+    showToast('Invalid declare! -50 💰 penalty');
+  }
+});
+
+// ---- AI turn (simple heuristic) ----
+function aiHeuristicDiscard(hand){
+  // score each card by how "connected" it is to others (same suit near rank, or same rank)
+  let worst = hand[0], worstScore = Infinity;
+  for(const c of hand){
+    let score = 0;
+    for(const o of hand){
+      if(o===c) continue;
+      if(o.s===c.s && Math.abs(RVAL[o.r]-RVAL[c.r])<=2) score += 2;
+      if(o.r===c.r) score += 3;
+    }
+    if(score < worstScore){ worstScore = score; worst = c; }
+  }
+  return worst;
+}
+function aiTurn(){
+  if(!gameActive) return;
+  // decide draw source: take discard if it closely matches hand, else stock
+  let drewCard;
+  const topDiscard = discardPile[discardPile.length-1];
+  let wantsDiscard = false;
+  if(topDiscard){
+    for(const c of aiHand){
+      if(c.s===topDiscard.s && Math.abs(RVAL[c.r]-RVAL[topDiscard.r])<=2) wantsDiscard=true;
+      if(c.r===topDiscard.r) wantsDiscard=true;
+    }
+  }
+  if(wantsDiscard && discardPile.length){
+    drewCard = discardPile.pop();
+  } else if(deck.length){
+    drewCard = deck.pop(); stockCount = deck.length;
+  } else if(discardPile.length){
+    drewCard = discardPile.pop();
+  } else { drewCard=null; }
+  if(drewCard) aiHand.push(drewCard);
+  renderAll();
+
+  setTimeout(()=>{
+    // check if AI can declare
+    if(aiHand.length===13){
+      const res = validateRummyHand(aiHand);
+      if(res.valid){ endGame('ai','valid'); return; }
+    }
+    const discardCard = aiHeuristicDiscard(aiHand);
+    const idx = aiHand.findIndex(c=>c.id===discardCard.id);
+    aiHand.splice(idx,1);
+    discardPile.push(discardCard);
+    turn='player'; phase='draw';
+    renderAll();
+    hudMsg('Your turn — draw a card');
+  }, 700);
+}
+
+function endGame(winner, reason){
+  gameActive=false;
+  const banner = document.getElementById('winnerBanner');
+  const title = document.getElementById('winnerTitle');
+  const reward = document.getElementById('winnerReward');
+  let net = 0;
+  if(winner==='player'){
+    net = 120; meta.coins += net; meta.lifetimeWinnings += net;
+    meta.handsWon++; meta.curStreak++; meta.bestStreak=Math.max(meta.bestStreak,meta.curStreak);
+    title.textContent='You Win!'; playWin(); fireConfetti();
+  } else {
+    net = -60; meta.coins = Math.max(0, meta.coins+net); meta.curStreak=0;
+    title.textContent='Opponent Wins'; playLose();
+  }
+  refreshProfileUI();
+  reward.textContent = (net>=0?'+':'') + net + ' 💰';
+  banner.classList.add('show');
+}
+
+function fireConfetti(){
+  const wrap = document.getElementById('tableWrap');
+  for(let i=0;i<20;i++){
+    const p = document.createElement('div');
+    const size = 12+Math.random()*8;
+    p.style.cssText = `position:absolute; left:${44+Math.random()*12}%; top:36%; width:${size}px; height:${size}px; border-radius:50%; z-index:45; pointer-events:none; background:radial-gradient(circle at 35% 30%, #fff3c4, #ffd23f 45%, #b8860b 100%); box-shadow:0 2px 4px rgba(0,0,0,0.4), inset 0 0 0 1.5px rgba(255,255,255,0.5); opacity:0.98;`;
+    const dx=(Math.random()-0.5)*280, dy=130+Math.random()*190, rot=(Math.random()-0.5)*900;
+    p.animate([{transform:'translate(0,0) rotate(0deg) scale(1)',opacity:1},{transform:`translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(0.7)`,opacity:0}], {duration:1100+Math.random()*500, easing:'cubic-bezier(.2,.7,.4,1)'});
+    wrap.appendChild(p); setTimeout(()=>p.remove(),1700);
+  }
+  const colors = ['#e8776b','#f6f1e4','#ffcf7a','#d99a3f'];
+  for(let i=0;i<16;i++){
+    const p = document.createElement('div');
+    const size = 5+Math.random()*4;
+    p.style.cssText = `position:absolute; left:${44+Math.random()*12}%; top:36%; width:${size}px; height:${size*1.6}px; background:${colors[i%colors.length]}; z-index:45; pointer-events:none; border-radius:1px; opacity:0.95;`;
+    const dx=(Math.random()-0.5)*260, dy=120+Math.random()*180, rot=(Math.random()-0.5)*720;
+    p.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},{transform:`translate(${dx}px, ${dy}px) rotate(${rot}deg)`,opacity:0}], {duration:1000+Math.random()*450, easing:'cubic-bezier(.2,.7,.4,1)'});
+    wrap.appendChild(p); setTimeout(()=>p.remove(),1600);
+  }
+}
+
+document.getElementById('playAgainBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); document.getElementById('winnerBanner').classList.remove('show'); newGame(); });
+document.getElementById('winnerHomeBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); document.getElementById('winnerBanner').classList.remove('show'); showScreen(homeScreen); refreshProfileUI(); });
+
+document.getElementById('playBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  showScreen(tableScreen);
+  setTimeout(()=>{ resizeCanvas(); newGame(); }, 30);
+});
+
+// ================= Multiplayer preview =================
+const multiplayerOverlay = document.getElementById('multiplayerOverlay');
+const lobbyOverlay = document.getElementById('lobbyOverlay');
+const myPlayerId = 'RM-' + Math.floor(100000+Math.random()*900000);
+let lobbySlots = [ { id: myPlayerId, name: meta.name, you:true } ];
+document.getElementById('onlineCard').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); openModal(multiplayerOverlay); });
+document.getElementById('closeMultiplayerBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); closeModal(multiplayerOverlay); });
+function renderLobby(){
+  document.getElementById('myPlayerId').textContent = myPlayerId;
+  document.getElementById('lobbyCount').textContent = lobbySlots.length;
+  const el = document.getElementById('lobbySlots'); el.innerHTML='';
+  for(let i=0;i<4;i++){
+    const slot = lobbySlots[i];
+    const row = document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(217,154,63,0.05);border:1px solid rgba(217,154,63,0.15);border-radius:10px;padding:8px 10px;';
+    if(slot){
+      row.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f0c878,#8a5a2a);display:flex;align-items:center;justify-content:center;font-size:13px;">${slot.you?'🧑':'👤'}</div>
+        <div style="flex:1;text-align:left;"><div style="font-size:12px;font-weight:600;">${slot.name}${slot.you?' (you)':''}</div><div style="font-size:10px;opacity:0.55;font-family:'JetBrains Mono',monospace;">${slot.id}</div></div>`;
+    } else {
+      row.style.opacity='0.5';
+      row.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;border:1.5px dashed rgba(217,154,63,0.4);"></div><div style="flex:1;text-align:left;font-size:12px;opacity:0.7;">Empty seat — invite a friend by ID</div>`;
+    }
+    el.appendChild(row);
+  }
+}
+document.getElementById('customRoomBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick(); closeModal(multiplayerOverlay);
+  document.getElementById('lobbyTitle').textContent='CUSTOM ROOM';
+  document.getElementById('lobbySub').textContent="Share your ID or enter a friend's to invite them.";
+  document.getElementById('lobbyIdRow').classList.remove('hidden');
+  document.getElementById('inviteRow').classList.remove('hidden');
+  lobbySlots=[{id:myPlayerId,name:meta.name,you:true}]; renderLobby(); openModal(lobbyOverlay);
+});
+document.getElementById('randomMatchBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick(); closeModal(multiplayerOverlay);
+  document.getElementById('lobbyTitle').textContent='RANDOM TABLE';
+  document.getElementById('lobbySub').textContent='Searching for players — needs a live matchmaking server to find anyone.';
+  document.getElementById('lobbyIdRow').classList.add('hidden');
+  document.getElementById('inviteRow').classList.add('hidden');
+  lobbySlots=[{id:myPlayerId,name:meta.name,you:true}]; renderLobby(); openModal(lobbyOverlay);
+});
+document.getElementById('sendInviteBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  const val = document.getElementById('inviteIdInput').value.trim();
+  if(!val) return;
+  showToast('Invite queued — sending real invites needs a server');
+  document.getElementById('inviteIdInput').value='';
+});
+document.getElementById('copyIdBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  const btn = document.getElementById('copyIdBtn');
+  if(navigator.clipboard){ navigator.clipboard.writeText(myPlayerId).catch(()=>{}); }
+  const orig = btn.textContent; btn.textContent='Copied!'; setTimeout(()=>{btn.textContent=orig;},1200);
+});
+document.getElementById('closeLobbyBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); closeModal(lobbyOverlay); });
+
+// ================= Init =================
+loadVault();
+refreshProfileUI();
+hapticsOn = document.getElementById('hapticToggle').checked;
+})();
+</script>
+</body>
+</html>

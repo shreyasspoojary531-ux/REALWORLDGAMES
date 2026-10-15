@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-variant": "#32343f", "on-tertiary-fixed": "#002113", "surface-tint": "#c0c1ff", "on-background": "#e1e1f0", "on-error-container": "#ffdad6", "on-secondary-container": "#00424e", "primary-fixed-dim": "#c0c1ff", "error": "#ffb4ab", "on-secondary-fixed-variant": "#004e5c", "primary-container": "#8083ff", "background": "#11131d", "secondary": "#4cd7f6", "on-tertiary-fixed-variant": "#005236", "outline-variant": "#464554", "on-tertiary": "#003824", "secondary-fixed": "#acedff", "tertiary-fixed": "#6ffbbe", "on-secondary": "#003640", "inverse-on-surface": "#2e303b", "secondary-container": "#03b5d3", "on-primary-container": "#0d0096", "on-error": "#690005", "surface-dim": "#11131d", "secondary-fixed-dim": "#4cd7f6", "tertiary": "#4edea3", "on-tertiary-container": "#000703", "surface-container-highest": "#32343f", "on-secondary-fixed": "#001f26", "on-surface": "#e1e1f0", "surface-container-lowest": "#0c0e18", "error-container": "#93000a", "surface-bright": "#373844", "tertiary-container": "#00885d", "surface-container": "#1d1f2a", "surface": "#11131d", "inverse-surface": "#e1e1f0", "on-primary": "#1000a9", "surface-container-high": "#282934", "surface-container-low": "#191b26", "on-primary-fixed-variant": "#2f2ebe", "on-surface-variant": "#c7c4d7", "primary": "#c0c1ff", "outline": "#908fa0", "on-primary-fixed": "#07006c", "inverse-primary": "#494bd6", "primary-fixed": "#e1e0ff", "tertiary-fixed-dim": "#4edea3" }, borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, spacing: { "space-sm": "0.5rem", "space-md": "1rem", "gutter": "1rem", "margin-tablet": "2rem", "space-lg": "1.5rem", "margin": "1rem", "gutter-desktop": "1.5rem", "margin-desktop": "3rem", "space-xl": "2.5rem", "space-xs": "0.25rem" }, fontFamily: { "label-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-sm": ["Inter"], "label-lg": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"] }, fontSize: { "label-md": ["12px", { lineHeight: "16px", fontWeight: "600" }], "headline-md": ["22px", { lineHeight: "28px", fontWeight: "700" }], "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }], "display-hero-mobile": ["34px", { lineHeight: "42px", fontWeight: "800" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "700" }], "label-sm": ["10px", { lineHeight: "14px", fontWeight: "700" }], "display-hero": ["48px", { lineHeight: "56px", fontWeight: "800" }], "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "label-lg": ["14px", { lineHeight: "20px", fontWeight: "700" }], "headline-lg-mobile": ["26px", { lineHeight: "34px", fontWeight: "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#11131d;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.35)]"><div class="h-16 px-gutter flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="ArcadePulse Game Hub Logo" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1UNve7AIPa9vXlW2qRS3iNNFnMJOJdN6wQ1s2ieNecQaTlRM9SlYc80HMDx5U04OFYSMfRwhfEoFI7Ga2yLXHZl1pItPjRI4n0EvZ9_02cMW5bapnuzGbndogf-qFV5TOz-QH3MZ0V7o2q1FF3V9q-nIY3gHgmch4_FMntsc1SO3TMdXIYsvs_Mt-0HKrfLmUCoilXPqirVAlDBAZf2A7n1pN3gE8L7-r6CIqxd8q26KDOZfVarutH58A"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate leading-tight">ArcadePulse</span><span class="font-label-sm text-label-sm text-secondary truncate leading-none uppercase tracking-wider">Home</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Search games" class="w-12 h-12 flex items-center justify-center rounded-full text-on-surface-variant hover:text-secondary transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">search</span></button><button aria-label="Settings" class="w-12 h-12 flex items-center justify-center rounded-full text-on-surface-variant hover:text-secondary transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">settings</span></button><div class="pl-space-xs flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6AXNiZ1RRDc4CHB9cijlqEYYn2Upur8e6nUj5TWaGUnXHWVvUrJdKZAkpe_LJXiKoJwzMyDzw4pL7ttwRXNAEXSxzrZpNcRMD-fJXE25TlBIvFAm4v7wo7M8wBu8At8nl7lQkqiwPFSVp6wKlLtpmsWb_UryV0gvg3W10hBIjYmdpRGH9T5_dsvbI_Vlef2VvEDl5PSE75TagFU6Ai6n6AvJMd8ayMAKkVgxOvgd-chRX4bHpq1kh"/></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full pb-10">
+<!-- 1. GREETING & STREAK STRIP -->
+<section class="px-gutter pt-2 pb-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Welcome back</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight truncate">Ready to play, Alex?</h1>
+</div>
+<!-- Flame Streak Badge -->
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high shadow-md">
+<span class="text-base select-none">🔥</span>
+<span class="font-label-md text-label-md text-tertiary font-bold tracking-tight">7-Day</span>
+</div>
+</div>
+<!-- Daily XP Goal Bar Widget -->
+<div class="mt-1 p-3 rounded-DEFAULT bg-surface-container flex flex-col gap-1.5 shadow-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">bolt</span>
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wider">Daily Quest Target</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="font-label-sm text-label-sm text-primary font-bold">320</span>
+<span class="font-label-sm text-label-sm text-outline">/ 500 XP</span>
+</div>
+</div>
+<!-- Track -->
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden relative">
+<div class="h-full rounded-full bg-gradient-to-r from-secondary to-primary" style="width: 64%;"></div>
+</div>
+</div>
+</section>
+<!-- 2. HERO CAROUSEL: FEATURED GAME -->
+<section class="px-gutter py-space-sm">
+<div class="relative w-full rounded-lg overflow-hidden bg-surface-container-low shadow-xl">
+<!-- Media Aspect Card -->
+<div class="relative w-full aspect-[16/10] overflow-hidden">
+<img class="w-full h-full object-cover select-none" data-alt="Futuristic neon cyber racing cars speeding on multi-lane elevated highway across a glowing cyberpunk metropolis Neo-Kyoto 2099 with light trails sparks and dark violet sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEfF989QwLAZifWMDh20kGwBzw3sVA6I7E9rtahXyNs1315zb0374EUBMsTP1IeA-ymbLJqFu1HN8BkMlU6bkAFeEqcwfEMDmMHWpNgI7e3naPuaDbiHAwTl03wfsUF9jCwwJjWl-jp1OCNGM7JT8i3bJgJsy9Lyvo8Kttq5fJ4_L490Sc2Y8Ee_oAY2EL4Ri2wl6mDWi-B0wM5LEGTna8gQzyNSQR5vT7ZRiXTZ-i6mq_hcdfBBOA"/>
+<!-- Gradients for depth and readability -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/60 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest/80 via-transparent to-transparent"></div>
+<!-- Badges on Hero -->
+<div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-lowest/80 backdrop-blur-md">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wider">Featured #1 of 3</span>
+</div>
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-lowest/80 backdrop-blur-md">
+<span class="material-symbols-outlined text-[16px] text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">4.9</span>
+<span class="font-label-sm text-label-sm text-outline">(14.2k)</span>
+</div>
+</div>
+<!-- Hero Content Overlay -->
+<div class="absolute bottom-3 left-3 right-3 flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full bg-secondary/20 text-secondary font-label-sm text-label-sm font-semibold">Arcade Racing</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-variant/70 text-on-surface-variant font-label-sm text-label-sm">Ultra HD 60fps</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-extrabold tracking-tight leading-tight">Neon Velocity 2099</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">High-octane anti-gravity racing across Neo-Kyoto skylines</p>
+</div>
+<!-- Hero Buttons -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 min-h-[48px] px-4 rounded-full bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-lg hover:opacity-95 active:scale-[0.98] transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">sports_esports</span>
+<span>Play Now</span>
+</button>
+<button aria-label="Add to Playlist" class="w-12 h-12 min-w-[48px] min-h-[48px] rounded-full bg-surface-container-highest/80 backdrop-blur-md text-on-surface flex items-center justify-center hover:bg-surface-bright active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[22px]">bookmark_add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Carousel Pagination Strip -->
+<div class="flex items-center justify-center gap-1.5 py-2 bg-surface-container-lowest">
+<span class="w-6 h-1.5 rounded-full bg-secondary"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-surface-variant"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-surface-variant"></span>
+</div>
+</div>
+</section>
+<!-- 3. CONTINUE PLAYING (HORIZONTAL SNAP SCROLL) -->
+<section class="py-space-sm flex flex-col gap-space-xs">
+<div class="px-gutter flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">history</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Continue Playing</h2>
+</div>
+<a class="font-label-md text-label-md text-secondary hover:underline flex items-center" href="#">
+<span>View All</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+<!-- Snap Scrollable Carousel -->
+<div class="flex gap-3 overflow-x-auto px-gutter no-scrollbar snap-x snap-mandatory pt-1 pb-2">
+<!-- Card 1: Neon Drop -->
+<div class="snap-start shrink-0 w-[240px] rounded-DEFAULT bg-surface-container p-2.5 flex flex-col gap-2 shadow-md">
+<div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="Neon Drop" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAl8ao4Ru-flj5W0fqnpVCNQ9A-PVEWBI6XuteFJZED4n5I2QW4IkIiXVr8SXPjtr53LGr3cHIthwBbiTZ7gs2DcyCdkfizFFlFqTXdNvLPHC-MVp5GGd57MNcvTDh2Xp06wNEwT5jHo6yK4y6Vjjs8A-vGxUjM5YHeHzA_z2JU2Ge6FWMSm0zXXNLn42TDsH9LHyraLFNc_-CouCvzbK3p6Y-iqyJ_zSEYDllFw1gOaXHVx-R-YRjP"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 via-transparent to-transparent"></div>
+<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-secondary font-label-sm text-label-sm">Puzzle</span>
+<!-- Mini resume button -->
+<button aria-label="Resume Neon Drop" class="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Neon Drop: Arcade</h3>
+<div class="flex items-center justify-between mt-0.5">
+<span class="font-body-sm text-body-sm text-tertiary font-semibold">Level 9</span>
+<span class="font-body-sm text-body-sm text-outline">High: 34,570</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Cyber Blitz Chess -->
+<div class="snap-start shrink-0 w-[240px] rounded-DEFAULT bg-surface-container p-2.5 flex flex-col gap-2 shadow-md">
+<div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Futuristic glowing holographic neon chess board with vibrant cyan and magenta pieces in deep space digital arena with particle grid reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5sS7RtRpQMsrerLrvm4apQfTQ8g3b_G08vL-FSLE66HSqOPNCJxTMAJJysxK_RCrU9SvQHy5ZLRiY8h3YE0eSSxm704xJ3YOVehd-4iBpPi4JNjJKIFIxh0qQ2FysfEaOh0RujFEg60Uxj3kQwQjrpIlZLO_ncsPjOKq-rSH5yCzZql6LoPys9ftURc-CWirZan05DCu948cuV42cyzsS6QP9UceozaljntJUkbABTUbwga6w5w5g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 via-transparent to-transparent"></div>
+<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-primary font-label-sm text-label-sm">Strategy</span>
+<button aria-label="Resume Cyber Blitz Chess" class="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Cyber Blitz Chess</h3>
+<div class="flex items-center justify-between mt-0.5">
+<span class="font-body-sm text-body-sm text-secondary font-semibold">Match 14</span>
+<span class="font-body-sm text-body-sm text-outline">Turn: Yours</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Aero Strike -->
+<div class="snap-start shrink-0 w-[240px] rounded-DEFAULT bg-surface-container p-2.5 flex flex-col gap-2 shadow-md">
+<div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Sci-fi laser jet fighter dogfighting between illuminated neon skyscrapers at dusk with supersonic energy trails and neon purple shields" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_AwOTX_fwHLpoRO98pshqOyGqJQ7_O42yBfyEz15ujnAv6T5Wz57vrNdnYbdarE71G-VSOL3WAezxcd4r_k8PGP5CmDsNUnvT23rAXmo8vSIUYHLLnqbdPyOLCs6H_jn_lVmItIJMrFudPV-rN5gjKxIi9r8C9-mA6wR-CA2u-ORT4jAHLo03PKp19hwfGM8b93qmrB3FIiZZ-lan5B8I9qlVxCdEM914wZkvXf_BcFjKsK60EITD"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 via-transparent to-transparent"></div>
+<span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-tertiary font-label-sm text-label-sm">Action</span>
+<button aria-label="Resume Aero Strike" class="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Aero Strike</h3>
+<div class="flex items-center justify-between mt-0.5">
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">Wave 22</span>
+<span class="font-body-sm text-body-sm text-outline">Score: 18,200</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. CATEGORY CHIPS (FILTER PILLS) -->
+<section class="py-space-sm">
+<div class="flex gap-2 overflow-x-auto px-gutter no-scrollbar">
+<!-- Active Pill -->
+<button class="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-md active:scale-95 transition-transform" type="button">
+<span>🔥</span>
+<span>All Games</span>
+<span class="ml-1 px-1.5 py-0.2 rounded-full bg-on-primary/20 text-on-primary font-label-sm text-label-sm font-bold">48</span>
+</button>
+<!-- Inactive Pills -->
+<button class="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 hover:text-on-surface active:scale-95 transition-transform" type="button">
+<span>🃏</span>
+<span>Card Territory</span>
+</button>
+<button class="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 hover:text-on-surface active:scale-95 transition-transform" type="button">
+<span>🧩</span>
+<span>Puzzle</span>
+</button>
+<button class="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 hover:text-on-surface active:scale-95 transition-transform" type="button">
+<span>🚀</span>
+<span>Arcade</span>
+</button>
+<button class="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 hover:text-on-surface active:scale-95 transition-transform" type="button">
+<span>♟️</span>
+<span>Strategy</span>
+</button>
+<button class="shrink-0 min-h-[44px] px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 hover:text-on-surface active:scale-95 transition-transform" type="button">
+<span>⚡</span>
+<span>Action</span>
+</button>
+</div>
+</section>
+<!-- 5. CARD TERRITORY HIGHLIGHTED SECTION -->
+<section class="px-gutter py-space-sm">
+<div class="relative w-full rounded-lg overflow-hidden bg-surface-container-high shadow-xl">
+<!-- Cosmic Card Battle Background -->
+<div class="relative w-full aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Mystical galactic chamber with cloaked mages casting glowing holographic tarot cards floating over cosmic nebula void, golden runes, luminous purple and cyan constellation beams" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDidk8RM3hejd_6OpKbxWinCxSgqvjL3g_aEKlAVa0P5JEgxt3tOgFCGIpsb866ozs6ZOUmGKphh5mPhLgJ2UIygnR9y2v1Sd6K-F3KrifO1c55PKm4vEemMTcyeoDMnm7ekjx3tMuTeaFQ8giodVTbtusqs6j1muaQIjRojbQH4zmVjVHA_tCy74GDpkTVImg6aDv3V2jaOffMlSoAyE5-DNiTVjQVcQcCbpPW72pUpMXuVar1dAh9"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest via-surface-container-highest/60 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-highest/80 via-transparent to-transparent"></div>
+<!-- Badges -->
+<div class="absolute top-3 left-3 flex items-center gap-2">
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container text-on-primary-container">
+<span class="material-symbols-outlined text-[16px]">style</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider font-bold">Card Territory</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-semibold">3 Games Inside</span>
+</div>
+</div>
+<!-- Content Panel -->
+<div class="p-4 bg-surface-container-highest flex flex-col gap-3">
+<div class="flex flex-col">
+<h2 class="font-headline-md text-headline-md text-on-surface font-extrabold tracking-tight">The Tactical Card Realm</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+            Enter the astral arena: battle through Cosmic Rift, master prophetic Tarot Solitaire, and stake chips in Cyber Blackjack.
+          </p>
+</div>
+<!-- Mini Game Thumbnails Preview -->
+<div class="grid grid-cols-3 gap-2">
+<div class="p-2 rounded-DEFAULT bg-surface-container flex flex-col items-center text-center gap-1">
+<span class="text-xl">🌌</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold truncate w-full">Cosmic Rift</span>
+<span class="font-body-sm text-body-sm text-outline text-[10px]">Deckbuilder</span>
+</div>
+<div class="p-2 rounded-DEFAULT bg-surface-container flex flex-col items-center text-center gap-1">
+<span class="text-xl">🔮</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold truncate w-full">Tarot Solitaire</span>
+<span class="font-body-sm text-body-sm text-outline text-[10px]">Arcane Match</span>
+</div>
+<div class="p-2 rounded-DEFAULT bg-surface-container flex flex-col items-center text-center gap-1">
+<span class="text-xl">♠️</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold truncate w-full">Cyber 21</span>
+<span class="font-body-sm text-body-sm text-outline text-[10px]">High Stakes</span>
+</div>
+</div>
+<!-- Realm CTA -->
+<button class="w-full min-h-[48px] px-4 rounded-full bg-secondary text-on-secondary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-transform mt-1" type="button">
+<span>Enter Realm</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 6. TRENDING NOW (HORIZONTAL ROW) -->
+<section class="py-space-sm flex flex-col gap-space-xs">
+<div class="px-gutter flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">trending_up</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Trending Now</h2>
+</div>
+<a class="font-label-md text-label-md text-secondary hover:underline flex items-center" href="#">
+<span>See More</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+<!-- Cards Row -->
+<div class="flex gap-3 overflow-x-auto px-gutter no-scrollbar snap-x snap-mandatory pt-1 pb-2">
+<!-- Trend 1: Pixel Overdrive -->
+<div class="snap-start shrink-0 w-[200px] rounded-DEFAULT bg-surface-container p-2.5 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Retro neon vector arcade pinball machine with hyper glowing bumpers holographic score counter and light ribbons in dark synthwave arcade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2I-DlxA6wIK-7BcSJwHcBnUDp7IKfBe5s-pIdJ81oxZ0gXQwZBqsvpfDzBM74mwfGZLXyOY-iARoXd2XwLowofif1pdogcz16m92sj8GWjJ7yh4JxQyzpNv6DmImrUmXKh6T2Dsq6oDoxxOrESzF23hG8kMc8ErmfSnVrgcoDJc2wpGNR-_Z9qVaMVwP5THef9emJN9HzOsSVVC5ZpwaK_xcBaY1my427h2BiOOMULPx941-DypTV"/>
+<!-- Favorite Toggle Button -->
+<button aria-label="Favorite Pixel Pinball" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/70 backdrop-blur-sm text-on-surface flex items-center justify-center active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-semibold">
+            ★ 4.8
+          </div>
+</div>
+<div class="flex flex-col min-w-0">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Neon Pinball FX</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Arcade Classic</span>
+<div class="mt-2 flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm font-semibold">Rank #2</span>
+<span class="font-label-sm text-label-sm text-tertiary">92k Plays</span>
+</div>
+</div>
+</div>
+<!-- Trend 2: Void Samurai -->
+<div class="snap-start shrink-0 w-[200px] rounded-DEFAULT bg-surface-container p-2.5 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Cybernetic samurai with glowing laser katana dashing through neon rain-slicked alley in dark dystopian futuristic city with vivid magenta reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvZSav2o-4SOY898lMSR3_FSysOf8TrVyVJ3qAP6aUKuMJoBLIzXr5bUSDxmqAk18rDm_fMJYd1Uz5Vz64imdFXJomSFYgBT40m0OXe-ww1FdwRYo4mIDkg-wgvJq-EXQkQCpDj7Edhu7StTu3YrEM_VqmsxsEoGvXS_SSJjDHo1QSgyTDZI-XmIp113xanGMTGRW4LuvPbHe6Hf27jETZxwfWmbSGuXuiiw7Bc5MUSedBC_QAPZ4J"/>
+<button aria-label="Favorite Cyber Samurai" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/70 backdrop-blur-sm text-error flex items-center justify-center active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-semibold">
+            ★ 4.9
+          </div>
+</div>
+<div class="flex flex-col min-w-0">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Katana Protocol</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Action Slasher</span>
+<div class="mt-2 flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm font-semibold">Hot</span>
+<span class="font-label-sm text-label-sm text-tertiary">140k Plays</span>
+</div>
+</div>
+</div>
+<!-- Trend 3: Chrono Puzzle -->
+<div class="snap-start shrink-0 w-[200px] rounded-DEFAULT bg-surface-container p-2.5 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Intricate glowing temporal clockwork puzzle spheres rotating in outer space with quantum light rays and crystalline prisms" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzdcb8UuoRqXlMRvyPjphcGSa-3RnXnRH67n37XtrJTWXWKsbM982jA1xhUphHrQK7ixZXX7lDQuGYsJLql3-iPnFnvBGAwqS9GygjPauggoItIIxuOsO4Qk9_V07FFQEFs8cvViQ4dBOqrwfOf98Cxfwd3BmUOkGy03EI2HwI_aaoxTQ6arivw6s5A0r_YvRjcXtXQmZgzo8eKW1yTgUQ_RDqQenNnspq80r6pTm_tUYKbnBkVOiC"/>
+<button aria-label="Favorite Chrono Core" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-lowest/70 backdrop-blur-sm text-on-surface flex items-center justify-center active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-semibold">
+            ★ 4.7
+          </div>
+</div>
+<div class="flex flex-col min-w-0">
+<h3 class="font-label-lg text-label-lg text-on-surface truncate">Chrono Core</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Time Puzzle</span>
+<div class="mt-2 flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm font-semibold">New</span>
+<span class="font-label-sm text-label-sm text-tertiary">38k Plays</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. QUICK PLAY (< 3 MINS) -->
+<section class="px-gutter py-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">timer</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Quick Play</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-outline font-label-sm text-label-sm">&lt; 3 mins</span>
+</div>
+</div>
+<!-- Bite-sized Row -->
+<div class="flex flex-col gap-2">
+<!-- Quick item 1 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container shadow-md">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Minimalist glowing geometric neon jump cube leaping over spike hazards in dark synthwave rhythm runner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6rvrhTNQnhdaUv8qKpiLxsaCu3lWh1U-xeYQJq_1abIDKofa6NU9pGYkMemGhXgy8K1TB9EeP1nTParWPfjo2q3Q951NGTjzdJ1D6JXsqFtqgs_ZlmKuHnP1BE_817ezYOzCzWKxiD-BCHobfu4TzKvF0LxE6JHSOWUal4NxbycwLdleAJc7pc6zWaqQFDLocdwiDSnaf_TrSjVT6YaGnlVlCh9fnAE9KU_YCqYLIg70WiyKxD3Eq"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface truncate">Neon Dash Blitz</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Rhythm Jump · 60s rounds</span>
+</div>
+</div>
+<button class="min-w-[48px] min-h-[48px] px-3 rounded-full bg-surface-container-highest text-secondary font-label-md text-label-md flex items-center justify-center hover:bg-surface-bright active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Quick item 2 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container shadow-md">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Retro stylized neon word anagram letters glowing in digital matrix cyberspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpz6a8VzJin_N3Sx-RzfRFM7x3tgGHfjuMqDzqCkPJSSQktvKs7FGPpffMerEREX8pjvgHeloYWkArc-WBaqLJwG_yC9-xqKvR0GE604aZ7g4Rr6Kfm0bQDGofsI0Xj8tTLtRXnwI-VZ6sSrJm5dG0As9OhIMYcel1s-7jLeBVASLEIAZt1OR6NuCVA6aR3zl1QXZevNa3h0RZWGsJRIx9TMIgbxubF1yPPAa0RfaLAjP0pJn0Qs9j"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface truncate">Word Surge 2.0</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Anagram Duel · 90s speed</span>
+</div>
+</div>
+<button class="min-w-[48px] min-h-[48px] px-3 rounded-full bg-surface-container-highest text-secondary font-label-md text-label-md flex items-center justify-center hover:bg-surface-bright active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 8. ALL GAMES 2-COLUMN CATALOG GRID -->
+<section class="px-gutter py-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">grid_view</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Game Catalog</h2>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Sort: Popular</span>
+</div>
+<!-- 2-Column Responsive Grid -->
+<div class="grid grid-cols-2 gap-3 pt-1">
+<!-- Catalog Item 1 -->
+<div class="rounded-DEFAULT bg-surface-container p-2 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Cyberpunk high speed hovercraft gliding over iridescent illuminated water canals with neon signs reflecting in nocturnal Neo-Tokyo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmezotInMHSp-STOj0Gtt6GFMCIA19fIQlSqYWB6sw2wnlHKxp_UM6hQdbARqxeYwxzVCdcDpIx1SheBYVa5o5i-7GYr5zSuug2u9RUoUonq0hGIjyLDAg3QNUcgp0WzxbsJehQqTl9HFWL1doWAOoypPBRMlCeLJK84cpQEScSNLaaMhBfHXt1D6-uvqtRIPwPbu29ol01joKdB6HmvRNyjthMk3-Q7VX1kKjMYjLRfx5E1xXyNow"/>
+<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-bold">4.8 ★</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Hydro Glide 3D</span>
+<span class="font-body-sm text-body-sm text-outline truncate">Racing</span>
+</div>
+<button class="w-full min-h-[48px] rounded-full bg-surface-container-high text-primary font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-primary hover:text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>Launch</span>
+</button>
+</div>
+<!-- Catalog Item 2 -->
+<div class="rounded-DEFAULT bg-surface-container p-2 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Pixel art space invader arcade lasers shooting alien mother ship with vibrant retro purple CRT monitor scanlines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjqInYkZEDH44yB6EN5uxCG-3EpfPHjatRA-PwtETx1K2i2z6b_DzA7Tbjj3m3n-liGYujXMVBSJ8QfBWMGl_LSQMsJ0WRofwAEOZ9X4NxF2JO1W86sE-66bMzAJ9p3g6Ilpb0_rZHuPehVmK193DcCM8_lX2wuGDX0bc__3zwEEiPUHQ0yy4CpJAOaoeMbrcqtPEKZhrRJWqkTWY3xv6-vlBlufl8gItGpJ1amQ09IdIwW9nsOEG9"/>
+<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-bold">4.6 ★</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Galaxy Void</span>
+<span class="font-body-sm text-body-sm text-outline truncate">Arcade Shooter</span>
+</div>
+<button class="w-full min-h-[48px] rounded-full bg-surface-container-high text-primary font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-primary hover:text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>Launch</span>
+</button>
+</div>
+<!-- Catalog Item 3 -->
+<div class="rounded-DEFAULT bg-surface-container p-2 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Luminescent neon alchemy potion jars exploding with colorful magical particle smoke in dark futuristic laboratory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqknXr5J0IH88gR1xQyV3-kdIsf2MVO8uWFWgoNFh78g4IgD3XAZuH7B6BY4eu2WXru_aKAp-pq69vePtQrUCOIeR10nXEhaqs8K2Lpr4iG9axaHwD0KZaIDRwwVQh56LesW0ipVvhDT2lBA37gk49etm9QOsGulYL8y9ipjZZ_Iki9DeyHb-xT-HyRd0ILB5gMmiBwcoFsX2RAH-G4sXhk1J-Z24rHZHhUA-58bAKQldTX6Rl-PcD"/>
+<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-bold">4.9 ★</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Potion Merge FX</span>
+<span class="font-body-sm text-body-sm text-outline truncate">Match &amp; Merge</span>
+</div>
+<button class="w-full min-h-[48px] rounded-full bg-surface-container-high text-primary font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-primary hover:text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>Launch</span>
+</button>
+</div>
+<!-- Catalog Item 4 -->
+<div class="rounded-DEFAULT bg-surface-container p-2 flex flex-col gap-2 shadow-md">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Futuristic glowing dungeon crawler hero with shield surrounded by glowing robotic goblins in cyber dungeon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK_tn_8mK95ca-0Jft0djS1nAN8W9IncvDpJObS5o8x37L1QtJtgbVou9kLuNMtOYBwNwPcMaE6eJvhI94znikUs-AqSKIcWBV0agvRoBBaBtAam0ZBJUovxx_hDLM7756EJklrwTN4UmdIO0O7_LRYV4cIVT9z8JwBgRxTjnnXJxCDWV7XXxmRoNyM_U6hbvXU5P5Qr95MhxPjw6elA0evw515aiutYr2B7eNug6UtMIVVeqHMCC-"/>
+<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-surface-container-lowest/80 text-secondary font-label-sm text-label-sm font-bold">4.7 ★</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Rogue Node</span>
+<span class="font-body-sm text-body-sm text-outline truncate">Roguelike RPG</span>
+</div>
+<button class="w-full min-h-[48px] rounded-full bg-surface-container-high text-primary font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-primary hover:text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>Launch</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 9. STATUS & FOOTER TELEMETRY -->
+<footer class="px-gutter pt-space-lg pb-space-sm flex flex-col items-center justify-center gap-2 text-center">
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-tertiary">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+<span class="font-label-sm text-label-sm tracking-wide">60 FPS ENGINE ONLINE · ZERO LATENCY</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline">ArcadePulse Hub v2.4 · Instant Play Enabled</span>
+</footer>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.4)]" data-active-classes="text-secondary [&amp;&gt;span.indicator]:opacity-100 [&amp;&gt;span.indicator]:scale-100"><div class="flex items-center justify-around h-16 px-space-xs max-w-lg mx-auto"><a aria-current="page" class="relative flex flex-col items-center justify-center w-14 h-12 min-w-[48px] min-h-[48px] transition-all text-secondary [&amp;&gt;span.indicator]:opacity-100 [&amp;&gt;span.indicator]:scale-100" data-path="home" href="#"><span class="material-symbols-outlined text-[22px]">sports_esports</span><span class="font-label-sm text-label-sm mt-0.5">Home</span><span class="indicator absolute -top-1 w-6 h-0.5 rounded-full bg-secondary opacity-0 scale-75 transition-all"></span></a><a class="relative flex flex-col items-center justify-center w-14 h-12 min-w-[48px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="games" href="#"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="font-label-sm text-label-sm mt-0.5">Games</span><span class="indicator absolute -top-1 w-6 h-0.5 rounded-full bg-secondary opacity-0 scale-75 transition-all"></span></a><a class="relative flex flex-col items-center justify-center w-14 h-12 min-w-[48px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="favorites" href="#"><span class="material-symbols-outlined text-[22px]">bookmark</span><span class="font-label-sm text-label-sm mt-0.5">Favorites</span><span class="indicator absolute -top-1 w-6 h-0.5 rounded-full bg-secondary opacity-0 scale-75 transition-all"></span></a><a class="relative flex flex-col items-center justify-center w-14 h-12 min-w-[48px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="scores" href="#"><span class="material-symbols-outlined text-[22px]">leaderboard</span><span class="font-label-sm text-label-sm mt-0.5">Scores</span><span class="indicator absolute -top-1 w-6 h-0.5 rounded-full bg-secondary opacity-0 scale-75 transition-all"></span></a><a class="relative flex flex-col items-center justify-center w-14 h-12 min-w-[48px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="settings" href="#"><span class="material-symbols-outlined text-[22px]">tune</span><span class="font-label-sm text-label-sm mt-0.5">Settings</span><span class="indicator absolute -top-1 w-6 h-0.5 rounded-full bg-secondary opacity-0 scale-75 transition-all"></span></a></div></nav></body></html>

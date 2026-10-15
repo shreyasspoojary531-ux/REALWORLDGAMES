@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku Clash</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --blue: #d99a3f; --blue-bright: #ffcf7a; --magenta: #b23a2f; --magenta-bright: #e8776b; --gold: #ffd23f;
+    --bg0: #1c0d08; --panel: rgba(40,22,12,0.75); --panel-border: rgba(217,154,63,0.32);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background: radial-gradient(circle at 20% 0%, rgba(140,60,20,0.18), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(120,20,15,0.16), transparent 45%),
+      radial-gradient(ellipse at 50% -10%, #3a1a10 0%, var(--bg0) 60%);
+    font-family:'Space Grotesk', sans-serif; color:#f3e6d6; -webkit-tap-highlight-color: transparent;
+  }
+  #app{ width:100%; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:12px; }
+  .screen{ width:min(600px,97vw); display:flex; flex-direction:column; gap:12px; }
+  .hidden{ display:none !important; }
+
+  @keyframes floatIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  .profile-card, .currency-bar, .mode-card, .quick-grid{ animation: floatIn 0.5s ease both; }
+  .mode-card:nth-of-type(1){ animation-delay:0.05s; }
+  .currency-bar{ animation-delay:0.03s; }
+  .quick-grid{ animation-delay:0.22s; }
+  @keyframes pulseGlow{ 0%,100%{ box-shadow:0 0 0 1px var(--gold), 0 0 14px rgba(255,210,63,0.2);} 50%{ box-shadow:0 0 0 1px var(--gold), 0 0 26px rgba(255,210,63,0.45);} }
+  .daily-card{ animation: floatIn 0.5s ease both, pulseGlow 2.4s ease-in-out infinite; animation-delay:0s, 0.5s; }
+
+  .logo{ font-family:'Poppins', sans-serif; font-weight:800; font-size:22px; letter-spacing:1px; color: var(--blue-bright); text-shadow:0 2px 6px rgba(0,0,0,0.5); text-align:center;}
+  .logo span{ color: var(--magenta-bright); text-shadow:0 0 12px rgba(178,58,47,0.9), 0 0 30px rgba(178,58,47,0.4); }
+
+  .btn{ font-family:'Space Grotesk',sans-serif; background: rgba(217,154,63,0.06); border:1px solid var(--panel-border); color:#dff7ff; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; letter-spacing:0.3px; transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
+  .btn:hover{ border-color:var(--blue); box-shadow:0 0 14px rgba(217,154,63,0.35); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0px) scale(.97); }
+  .btn.primary{ background:linear-gradient(135deg, var(--blue), var(--magenta)); color:#03060c; border:none; font-weight:700; box-shadow:0 4px 20px rgba(217,154,63,0.35); }
+  .btn.icon{ padding:8px 10px; font-size:14px; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; box-shadow:none; transform:none; }
+
+  /* ---- Home ---- */
+  .profile-card{ display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid rgba(217,154,63,0.2); border-radius:14px; padding:12px 14px; }
+  .avatar{ width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0c2136,#1a3a55); display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid rgba(217,154,63,0.35); flex:none; overflow:hidden; }
+  .profile-info{ flex:1; min-width:0; }
+  .profile-name{ font-size:13px; font-weight:600; }
+  .rank-line{ display:flex; align-items:center; gap:6px; font-size:11px; opacity:0.85; margin-top:2px; }
+  .rank-badge{ font-size:13px; }
+  .progress-track{ height:5px; border-radius:4px; background:rgba(255,255,255,0.08); margin-top:6px; overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--blue),var(--magenta)); }
+
+  .currency-bar{ display:flex; gap:8px; }
+  .cur-pill{ flex:1; display:flex; align-items:center; justify-content:center; gap:6px; background:var(--panel); border:1px solid rgba(217,154,63,0.18); border-radius:10px; padding:9px 6px; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; }
+  .cur-icon{ width:17px; height:17px; flex:none; }
+  .cur-pill .plus{ margin-left:4px; width:18px; height:18px; border-radius:50%; background:rgba(217,154,63,0.15); display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; }
+
+  .section-title{ font-size:11px; letter-spacing:1.5px; opacity:0.6; text-transform:uppercase; margin:2px 2px -2px; }
+
+  .mode-card{ display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid rgba(217,154,63,0.18); border-radius:14px; padding:13px 14px; cursor:pointer; transition:all .15s ease; }
+  .mode-card:hover{ border-color:var(--blue); box-shadow:0 0 18px rgba(217,154,63,0.2); }
+  .mode-card:active{ transform:scale(0.97); }
+  .mode-card.locked{ opacity:0.5; cursor:not-allowed; }
+  .mode-card .mi{ font-size:24px; flex:none; width:36px; text-align:center; }
+  .svg-icon{ width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 0 4px currentColor); }
+  .mode-card .mi .svg-icon, .quick-btn .ic .svg-icon{ color:var(--blue-bright); }
+  .mode-card .mt{ flex:1; }
+  .mode-card .mt .n{ font-size:13.5px; font-weight:700; }
+  .mode-card .mt .d{ font-size:11px; opacity:0.65; margin-top:1px; }
+  .mode-card .tag{ font-size:9px; padding:3px 7px; border-radius:6px; background:rgba(217,154,63,0.15); border:1px solid rgba(217,154,63,0.3); letter-spacing:0.4px; }
+  .mode-card .tag.lock{ background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); }
+
+  .diff-row{ display:flex; gap:6px; margin-top:-6px; }
+  .diff-chip{ flex:1; text-align:center; padding:6px 4px; border-radius:8px; border:1px solid rgba(217,154,63,0.15); background:rgba(217,154,63,0.03); font-size:10.5px; letter-spacing:0.4px; cursor:pointer; opacity:0.7; transition:all .15s ease; }
+  .diff-chip.selected{ border-color:var(--blue); background:rgba(217,154,63,0.12); opacity:1; box-shadow:0 0 10px rgba(217,154,63,0.2); }
+
+  .quick-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .quick-btn{ display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--panel); border:1px solid rgba(217,154,63,0.15); border-radius:12px; padding:10px 2px; cursor:pointer; font-size:9px; letter-spacing:0.3px; opacity:0.85; transition:all .15s ease; }
+  .quick-btn:hover{ border-color:var(--blue); opacity:1; box-shadow:0 0 12px rgba(217,154,63,0.2); }
+  .quick-btn:active{ transform:scale(0.94); }
+  .quick-btn .ic{ font-size:19px; }
+
+  /* ---- Match ---- */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .topbar-title{ font-size:11.5px; opacity:0.7; letter-spacing:0.3px; text-align:center; flex:1; }
+  .topbar-btns{ display:flex; gap:6px; }
+  .scoreboard{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pcard{ flex:1; min-width:100px; background:rgba(40,22,12,0.88); border:1px solid rgba(217,154,63,0.15); border-radius:10px; padding:7px 10px; position:relative; overflow:hidden; transition:border-color .2s ease, box-shadow .2s ease; }
+  .pcard.active{ border-color: var(--blue); box-shadow:0 0 0 1px var(--blue), 0 0 22px rgba(217,154,63,0.3); }
+  .pcard .pname{ font-size:10.5px; letter-spacing:0.4px; opacity:0.75; display:flex; align-items:center; gap:5px;}
+  .pcard .pscore{ font-family:'JetBrains Mono', monospace; font-size:19px; font-weight:600; margin-top:2px;}
+  .swatch{ width:9px; height:9px; border-radius:50%; display:inline-block; flex:none; }
+  .sw-white{ background:radial-gradient(circle at 35% 30%, #ffffff, #cfc7ba); box-shadow:0 0 6px rgba(0,0,0,0.4);}
+  .sw-black{ background:radial-gradient(circle at 35% 30%, #555, #0b0b0b); box-shadow:0 0 6px rgba(0,0,0,0.6);}
+
+  .stat-row{ display:flex; gap:8px; }
+  .stat-pill{ flex:1; background:var(--panel); border:1px solid rgba(217,154,63,0.15); border-radius:10px; padding:7px 6px; text-align:center; }
+  .stat-pill .v{ font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; }
+  .stat-pill .l{ font-size:9px; opacity:0.6; letter-spacing:0.5px; text-transform:uppercase; margin-top:1px; }
+  .stat-pill.warn .v{ color:var(--magenta-bright); }
+
+  .stage-wrap{ position:relative; width:100%; touch-action:none; }
+  @keyframes matchSweepAnim{ 0%{ opacity:0; background-position:-100% -100%; } 15%{ opacity:1; } 85%{ opacity:1; } 100%{ opacity:0; background-position:100% 100%; } }
+  #matchSweep.play{ animation: matchSweepAnim 1.1s ease-out; }
+
+  .sudoku-grid{ width:100%; aspect-ratio:1/1; display:grid; grid-template-columns:repeat(9,1fr); grid-template-rows:repeat(9,1fr);
+    border-radius:14px; overflow:hidden; box-shadow:0 20px 70px rgba(0,0,0,0.7), 0 0 0 2px var(--blue), 0 0 40px rgba(120,60,20,0.14), inset 0 0 50px rgba(0,0,0,0.5);
+    background:linear-gradient(160deg, rgba(30,17,10,0.95), rgba(10,6,4,0.98)); position:relative; z-index:1; }
+  .sud-cell{ display:flex; align-items:center; justify-content:center; position:relative; font-family:'JetBrains Mono',monospace; font-size:clamp(14px,4.2vw,22px); font-weight:600;
+    border:1px solid rgba(217,154,63,0.12); background:rgba(255,255,255,0.015); cursor:pointer; user-select:none; color:var(--blue-bright); transition:background .12s ease; }
+  .sud-cell:nth-child(3n){ border-right:2px solid rgba(217,154,63,0.55); }
+  .sud-cell:nth-child(9n+1){ border-left:2px solid rgba(217,154,63,0.55); }
+  .sud-cell.row3n{ border-bottom:2px solid rgba(217,154,63,0.55); }
+  .sud-cell.row0{ border-top:2px solid rgba(217,154,63,0.55); }
+  .sud-cell.given{ color:#fff3d2; font-weight:800; }
+  .sud-cell.userfill{ color:#8fd3ff; }
+  .sud-cell.peer{ background:rgba(217,154,63,0.07); }
+  .sud-cell.selected{ background:rgba(217,154,63,0.28) !important; box-shadow:inset 0 0 0 2px var(--gold); }
+  .sud-cell.samenum{ background:rgba(255,210,63,0.16); }
+  .sud-cell.conflict{ color:var(--magenta-bright) !important; background:rgba(178,58,47,0.28) !important; animation:cellShake .25s ease; }
+  .sud-cell.hinted{ animation:hintPulse 1s ease; }
+  .sud-cell.owner1{ background:rgba(178,58,47,0.12); }
+  @keyframes cellShake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-3px);} 75%{transform:translateX(3px);} }
+  @keyframes hintPulse{ 0%{box-shadow:inset 0 0 0 2px var(--gold), 0 0 16px var(--gold);} 100%{box-shadow:inset 0 0 0 0px transparent;} }
+  .notes-grid{ position:absolute; inset:2px; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); pointer-events:none; }
+  .notes-grid span{ display:flex; align-items:center; justify-content:center; font-size:clamp(6px,1.6vw,9px); opacity:0.6; font-family:'JetBrains Mono',monospace; color:var(--blue-bright); }
+
+  .hud-msg{ position:absolute; top:10px; left:50%; transform:translate(-50%,0); background:rgba(3,8,16,0.75); border:1px solid var(--panel-border); padding:6px 16px; border-radius:20px; font-size:12px; letter-spacing:0.4px; opacity:0; transition:opacity .3s ease, transform .3s ease; pointer-events:none; white-space:nowrap; color: var(--blue-bright); text-shadow:0 0 8px rgba(217,154,63,0.6); z-index:6; }
+  .hud-msg.show{ opacity:1; transform:translate(-50%,4px); }
+  .trainer-badge{ position:absolute; top:10px; right:10px; background:rgba(255,210,63,0.14); border:1px solid rgba(255,210,63,0.4); color:var(--gold); font-size:10px; padding:4px 8px; border-radius:8px; letter-spacing:0.4px; z-index:6; }
+  .footer-hint{ font-size:10.5px; opacity:0.45; letter-spacing:0.3px; text-align:center; }
+
+  .numpad{ display:grid; grid-template-columns:repeat(9,1fr); gap:6px; }
+  .num-btn{ aspect-ratio:1/1; border-radius:10px; background:var(--panel); border:1px solid rgba(217,154,63,0.22); color:#f3e6d6; font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; transition:all .12s ease; position:relative; }
+  .num-btn:hover{ border-color:var(--blue); box-shadow:0 0 12px rgba(217,154,63,0.25); }
+  .num-btn:active{ transform:scale(0.92); }
+  .num-btn .cnt{ font-size:7px; opacity:0.55; font-weight:400; margin-top:1px; }
+  .num-btn.done{ opacity:0.25; cursor:default; pointer-events:none; }
+  .tool-row{ display:flex; gap:6px; }
+  .tool-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; background:var(--panel); border:1px solid rgba(217,154,63,0.18); border-radius:10px; padding:8px 4px; cursor:pointer; font-size:9.5px; letter-spacing:0.3px; opacity:0.85; }
+  .tool-btn:hover{ border-color:var(--blue); opacity:1; }
+  .tool-btn.active{ border-color:var(--gold); background:rgba(255,210,63,0.14); color:var(--gold); opacity:1; }
+  .tool-btn .ic{ font-size:16px; }
+  .tool-btn .sub{ font-size:8px; opacity:0.6; }
+
+  /* ---- Modals ---- */
+  .modal-overlay{ position:fixed; inset:0; z-index:50; background:radial-gradient(ellipse at 50% 30%, rgba(0,60,90,0.35), rgba(2,4,9,0.94)); display:flex; align-items:center; justify-content:center; backdrop-filter: blur(4px); padding:14px; }
+  .modal{ width:min(440px, 92vw); max-height:86vh; overflow-y:auto; background:linear-gradient(160deg, rgba(6,16,28,0.96), rgba(2,5,10,0.98)); border:1px solid var(--panel-border); border-radius:18px; padding:24px 22px; box-shadow:0 30px 90px rgba(0,0,0,0.7), 0 0 70px rgba(217,154,63,0.1); text-align:center; }
+  .modal h1{ font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; margin:0 0 4px; letter-spacing:0.5px; color: var(--blue-bright); text-shadow:0 2px 6px rgba(0,0,0,0.4); }
+  .modal p.sub{ font-size:12px; opacity:0.6; margin:0 0 18px; }
+
+  .rules-body, .help-body{ text-align:left; font-size:13px; line-height:1.6; opacity:0.85; }
+  .rules-body h3, .help-body h3{ font-size:12px; letter-spacing:1px; color:var(--blue-bright); margin:16px 0 6px; text-transform:uppercase; }
+  .rules-body h3:first-child, .help-body h3:first-child{ margin-top:0; }
+
+  .winner-banner{ position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:rgba(2,4,9,0.88); border-radius:14px; opacity:0; pointer-events:none; transition:opacity .4s ease; flex-direction:column; gap:12px; text-align:center; padding:20px; }
+  .winner-banner.show{ opacity:1; pointer-events:all; }
+  .winner-banner h2{ font-family:'Poppins',sans-serif; font-weight:700; font-size:22px; margin:0; letter-spacing:0.5px; color: var(--gold); text-shadow:0 2px 8px rgba(0,0,0,0.5); }
+  .reward-line{ font-family:'JetBrains Mono',monospace; font-size:13px; }
+  .stats-line{ font-size:11px; opacity:0.6; font-family:'JetBrains Mono',monospace; }
+  .winner-btns{ display:flex; gap:8px; }
+
+  .slider-row{ display:flex; align-items:center; gap:10px; margin:12px 0; text-align:left; }
+  .slider-row label{ flex:0 0 108px; font-size:12px; opacity:0.85; }
+  .slider-row input[type=range]{ flex:1; accent-color:var(--blue); }
+  .slider-row .val{ width:32px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:11px; opacity:0.7; }
+  .settings-section-title{ font-size:11px; letter-spacing:1px; color:var(--magenta-bright); text-transform:uppercase; margin:18px 0 4px; text-align:left; }
+  .settings-section-title:first-of-type{ margin-top:0; }
+
+  .theme-grid{ display:flex; gap:10px; margin:14px 0; flex-wrap:wrap; }
+  .theme-swatch{ flex:1; min-width:80px; border-radius:12px; padding:14px 6px; cursor:pointer; border:1px solid var(--panel-border); display:flex; flex-direction:column; align-items:center; gap:8px; transition:all .15s ease; }
+  .theme-swatch.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 0 20px rgba(255,210,63,0.25); }
+  .theme-dots{ display:flex; gap:5px; }
+  .theme-dots span{ width:14px; height:14px; border-radius:50%; }
+  .theme-swatch .l{ font-size:10px; opacity:0.75; letter-spacing:0.4px; }
+
+  .tabbar{ display:flex; gap:6px; margin-bottom:14px; }
+  .tab{ flex:1; padding:8px; border-radius:8px; border:1px solid var(--panel-border); background:rgba(217,154,63,0.03); font-size:11.5px; cursor:pointer; letter-spacing:0.3px; }
+  .tab.active{ border-color:var(--blue); background:rgba(217,154,63,0.1); }
+
+  .placeholder-note{ font-size:11px; opacity:0.55; background:rgba(255,210,63,0.06); border:1px solid rgba(255,210,63,0.2); border-radius:8px; padding:8px 10px; margin-top:14px; text-align:left; line-height:1.5; }
+
+  .shop-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px; }
+  .shop-item{ background:rgba(217,154,63,0.04); border:1px solid rgba(217,154,63,0.15); border-radius:10px; padding:14px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .shop-item .ic{ font-size:22px; }
+  .shop-item .n{ font-size:11px; }
+  .shop-item .p{ font-size:10px; opacity:0.7; font-family:'JetBrains Mono',monospace; }
+
+  .rank-ladder{ display:flex; flex-direction:column; gap:6px; text-align:left; margin-bottom:14px; }
+  .rank-tier{ display:flex; align-items:center; gap:10px; padding:7px 9px; border-radius:8px; background:rgba(255,255,255,0.02); font-size:12px; }
+  .rank-tier.current{ background:rgba(217,154,63,0.1); border:1px solid var(--blue); }
+  .rank-row{ display:flex; justify-content:space-between; padding:8px 4px; border-bottom:1px solid rgba(217,154,63,0.1); font-size:13px; }
+  .rank-row .r{ opacity:0.6; width:26px; }
+  .rank-row .s{ font-family:'JetBrains Mono',monospace; }
+
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin:10px 0; }
+  .toggle-row label{ font-size:12px; opacity:0.85; }
+  .switch{ position:relative; width:38px; height:20px; flex:none; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch .sl{ position:absolute; inset:0; background:rgba(255,255,255,0.15); border-radius:20px; cursor:pointer; transition:.2s; }
+  .switch .sl:before{ content:""; position:absolute; width:14px; height:14px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .sl{ background:var(--blue); }
+  .switch input:checked + .sl:before{ transform:translateX(18px); }
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+  <defs>
+    <radialGradient id="coinGrad" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#fff3c0"/>
+      <stop offset="55%" stop-color="#ffcf5a"/>
+      <stop offset="100%" stop-color="#c9860f"/>
+    </radialGradient>
+    <linearGradient id="diamondGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8f9ff"/>
+      <stop offset="45%" stop-color="#9fd8ea"/>
+      <stop offset="100%" stop-color="#3d8fa8"/>
+    </linearGradient>
+    <symbol id="coinIcon" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="url(#coinGrad)" stroke="#a5690a" stroke-width="1"/>
+      <circle cx="12" cy="12" r="6.8" fill="none" stroke="#a5690a" stroke-width="0.9" opacity="0.55"/>
+      <path d="M12 7.3c-1.6 0-2.6.9-2.6 1.9 0 2.6 4.4 1.5 4.4 3.7 0 1-1 1.8-2.4 1.8-1.1 0-2-.5-2.4-1.3M12 6.4v1M12 16.6v-1" stroke="#a5690a" stroke-width="1" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="diamondIcon" viewBox="0 0 24 24">
+      <path d="M7 4h10l4 5.5L12 21 3 9.5 7 4z" fill="url(#diamondGrad)" stroke="#2c6b80" stroke-width="0.8" stroke-linejoin="round"/>
+      <path d="M7 4l2.2 5.5H3M17 4l-2.2 5.5H21M9.2 9.5 12 21l2.8-11.5M3 9.5h18" stroke="#2c6b80" stroke-width="0.6" opacity="0.6" fill="none"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="app">
+
+<!-- ============ HOME SCREEN ============ -->
+<div class="screen" id="homeScreen">
+  <div style="display:flex;align-items:center;justify-content:center;position:relative;">
+    <div class="logo">SUDOKU <span>CLASH</span></div>
+    <button class="btn icon" id="quickMuteBtn" style="position:absolute;right:0;" title="Mute">🔊</button>
+  </div>
+
+  <div class="profile-card">
+    <div class="avatar" id="avatarIcon" style="cursor:pointer;">🧑‍🎓</div>
+    <div class="profile-info">
+      <div class="profile-name">
+        <span id="profileName">Guest_000000</span>
+        <span id="editNameBtn" style="cursor:pointer;opacity:0.6;font-size:11px;margin-left:6px;">✏️ edit</span>
+      </div>
+      <div class="rank-line"><span class="rank-badge" id="rankBadgeIcon">🥉</span><span id="rankBadgeName">Rookie</span><span style="opacity:0.5;display:inline-flex;align-items:center;gap:3px;">· <span id="rankDiamondsTxt">0</span> lifetime <svg class="cur-icon" style="width:12px;height:12px;"><use href="#diamondIcon"/></svg></span></div>
+      <div class="progress-track"><div class="progress-fill" id="rankProgressFill" style="width:0%"></div></div>
+      <div id="streakLine" class="hidden" style="font-size:10.5px;color:var(--gold);margin-top:4px;font-weight:600;">🔥 Win Streak: 0</div>
+    </div>
+  </div>
+
+  <div class="currency-bar">
+    <div class="cur-pill"><svg class="cur-icon"><use href="#coinIcon"/></svg> <span id="coinTotal">0</span> <span class="plus" id="coinPlusBtn">+</span></div>
+    <div class="cur-pill"><svg class="cur-icon"><use href="#diamondIcon"/></svg> <span id="diamondTotal">0</span></div>
+  </div>
+
+  <div class="mode-card daily-card" id="dailyBonusCard" style="border-color:rgba(255,210,63,0.4);">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon" style="color:var(--gold);"><path d="M12 3s5 4.5 5 9a5 5 0 0 1-10 0c0-4.5 5-9 5-9z"/><path d="M12 12.5c1.2 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2"/></svg></div>
+    <div class="mt"><div class="n">Daily Streak</div><div class="d" id="dailyBonusDesc">Day 1 reward ready to claim</div></div>
+    <div class="tag" id="dailyBonusTag" style="background:rgba(255,210,63,0.18);border-color:rgba(255,210,63,0.45);color:var(--gold);">CLAIM</div>
+  </div>
+
+  <div class="mode-card" id="adFreePromoCard" style="border-color:rgba(217,154,63,0.4);background:linear-gradient(135deg, rgba(217,154,63,0.08), rgba(178,58,47,0.05));">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><path d="M4 4l16 16M9 9a3 3 0 0 0 4.24 4.24M6.5 6.7C4.7 7.9 3.4 9.7 3 12c1.3 4.5 5 7 9 7 1.6 0 3.1-.4 4.5-1.2M12 5c4 0 7.7 2.5 9 7-.4 1.4-1.1 2.6-2 3.7"/></svg></div>
+    <div class="mt"><div class="n">Go Ad-Free</div><div class="d">No more interstitials — $3.99/month</div></div>
+    <div class="tag" style="background:rgba(217,154,63,0.18);border-color:rgba(217,154,63,0.45);">SUBSCRIBE</div>
+  </div>
+
+  <div class="section-title">Play</div>
+
+  <div class="mode-card" id="levelsCard" data-mode="levels">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+    <div class="mt"><div class="n">Level <span id="levelNum">1</span></div><div class="d">Solo campaign · never-ending, gets tougher every stage</div></div>
+    <div class="tag">CONTINUE</div>
+  </div>
+
+  <div class="mode-card" data-mode="bot">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><rect x="5" y="8" width="14" height="11" rx="3"/><circle cx="9.5" cy="13.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13.5" r="1.3" fill="currentColor" stroke="none"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1.2"/><path d="M2 12h3M19 12h3"/></svg></div>
+    <div class="mt"><div class="n">Practice vs Bot</div><div class="d">Offline · race the CPU to fill more cells</div></div>
+    <div class="tag">TRAIN</div>
+  </div>
+  <div class="diff-row" id="diffRow">
+    <div class="diff-chip" data-diff="easy">Easy</div>
+    <div class="diff-chip selected" data-diff="medium">Medium</div>
+    <div class="diff-chip" data-diff="hard">Hard</div>
+    <div class="diff-chip" data-diff="expert">Expert</div>
+  </div>
+
+  <div class="mode-card" id="wagerCard" style="border-color:rgba(255,210,63,0.35);">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon" style="color:var(--gold);"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6"/><path d="M5 12v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-6"/></svg></div>
+    <div class="mt"><div class="n">Wager Match</div><div class="d">Stake coins · first to solve takes the pot</div></div>
+    <div class="tag" style="background:rgba(255,210,63,0.15);border-color:rgba(255,210,63,0.4);color:var(--gold);">STAKE</div>
+  </div>
+  <div class="mode-card" data-mode="2">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="7" cy="8" r="3"/><path d="M2.5 19c0-3 2-5 4.5-5s4.5 2 4.5 5"/><circle cx="17" cy="8" r="3"/><path d="M12.5 19c0-3 2-5 4.5-5s4.5 2 4.5 5"/></svg></div>
+    <div class="mt"><div class="n">Local 1v1</div><div class="d">Pass-and-play, same device</div></div>
+  </div>
+  <div class="mode-card" data-mode="4">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="7" cy="7" r="2.4"/><circle cx="17" cy="7" r="2.4"/><circle cx="7" cy="17" r="2.4"/><circle cx="17" cy="17" r="2.4"/><path d="M7 9.4V14.6M17 9.4V14.6M9.4 7H14.6M9.4 17H14.6" opacity="0.5"/></svg></div>
+    <div class="mt"><div class="n">Local 2v2</div><div class="d">Teams of 2, pass-and-play</div></div>
+  </div>
+  <div class="mode-card" id="onlineCard" style="opacity:0.85;">
+    <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 4 5.2 4 8.5s-1.4 6.1-4 8.5c-2.6-2.4-4-5.2-4-8.5s1.4-6.1 4-8.5z"/></svg></div>
+    <div class="mt"><div class="n">Multiplayer</div><div class="d">Random match or invite friends by ID</div></div>
+    <div class="tag lock">🔒 PREVIEW</div>
+  </div>
+
+  <div class="section-title">More</div>
+  <div class="quick-grid">
+    <div class="quick-btn" id="navThemes"><span class="ic"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></span>THEMES</div>
+    <div class="quick-btn" id="navRank"><span class="ic"><svg viewBox="0 0 24 24" class="svg-icon"><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4"/><path d="M12 14v3M9 20h6M9.5 17h5l.5 3h-6l.5-3z"/></svg></span>RANK</div>
+    <div class="quick-btn" id="navShop"><span class="ic"><svg viewBox="0 0 24 24" class="svg-icon"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.6L20.5 8H6.5"/><circle cx="9.5" cy="20" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.2" fill="currentColor" stroke="none"/></svg></span>SHOP</div>
+    <div class="quick-btn" id="navHelp"><span class="ic"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.9 2.1c-.9.6-1.4 1.1-1.4 2.2"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></svg></span>HELP</div>
+    <div class="quick-btn" id="navSettings"><span class="ic"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.6M12 18.9v2.6M21.5 12h-2.6M5.1 12H2.5M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8M18.4 18.4l-1.8-1.8M7.4 7.4 5.6 5.6"/></svg></span>SETTINGS</div>
+  </div>
+</div>
+
+<!-- ============ MATCH SCREEN ============ -->
+<div class="screen hidden" id="matchScreen">
+  <div class="topbar">
+    <button class="btn icon" id="exitMatchBtn" title="Home">🏠</button>
+    <div class="topbar-title" id="matchTitle">Level 1 · Easy</div>
+    <div class="topbar-btns">
+      <button class="btn icon" id="settingsBtn2" title="Settings">⚙️</button>
+      <button class="btn icon" id="rulesBtn2" title="Rules">❓</button>
+    </div>
+  </div>
+
+  <div class="scoreboard hidden" id="scoreboard"></div>
+  <div class="stat-row" id="statRow"></div>
+
+  <div class="stage-wrap">
+    <div class="sudoku-grid" id="sudokuGrid"></div>
+    <div id="matchSweep" style="position:absolute;inset:0;border-radius:14px;pointer-events:none;background:linear-gradient(115deg, transparent 30%, rgba(255,240,200,0.35) 48%, transparent 66%); background-size:250% 250%; background-position:-100% -100%; opacity:0;"></div>
+    <div class="hud-msg" id="hudMsg"></div>
+    <div class="trainer-badge hidden" id="trainerBadge">✓ AUTO-CHECK ON</div>
+    <div class="trainer-badge hidden" id="stakeBadge" style="top:auto;bottom:10px;right:10px;color:var(--gold);border-color:rgba(255,210,63,0.4);background:rgba(255,210,63,0.14);">💰 Staked: 0</div>
+    <div class="winner-banner" id="winnerBanner">
+      <h2 id="winnerText">Puzzle Solved!</h2>
+      <div class="reward-line" id="rewardLine">+0 🪙 · +0 💎</div>
+      <div class="reward-line hidden" id="wagerLine" style="font-size:15px;font-weight:700;"></div>
+      <div class="stats-line" id="statsLine">0:00 · 0 mistakes</div>
+      <div class="winner-btns">
+        <button class="btn" id="homeFromWinBtn">Home</button>
+        <button class="btn primary" id="playAgainBtn">Next Puzzle</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="numpad" id="numpad"></div>
+  <div class="tool-row">
+    <div class="tool-btn" id="notesBtn"><span class="ic">✏️</span>Notes<span class="sub" id="notesSub">off</span></div>
+    <div class="tool-btn" id="eraseBtn"><span class="ic">⌫</span>Erase</div>
+    <div class="tool-btn" id="undoBtn"><span class="ic">↩️</span>Undo</div>
+    <div class="tool-btn" id="hintBtn"><span class="ic">💡</span>Hint<span class="sub" id="hintCostTxt">−40🪙</span></div>
+  </div>
+  <div class="footer-hint" id="footerHint">Tap a cell, then tap a number. Fill every row, column and 3×3 box with 1–9.</div>
+</div>
+
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-overlay hidden" id="rulesOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">RULES</h1>
+    <div class="rules-body">
+      <h3>The goal</h3>
+      Fill the 9×9 grid so every row, every column, and every bold 3×3 box contains the digits 1 through 9 exactly once. No repeats, anywhere, ever.
+      <h3>Making a move</h3>
+      Tap an empty cell, then tap a number on the pad below. Cells with bold numbers are givens and can't be changed. Tap ✏️ Notes to switch into pencil-mark mode and jot down candidates in the corners of a cell instead of committing to an answer.
+      <h3>Tools</h3>
+      Erase clears the selected cell. Undo steps back your last move. Hint reveals the correct digit for a cell for a small coin cost — useful, but it trims your reward at the end.
+      <h3>Auto-Check</h3>
+      When on (default), a wrong digit is flagged red immediately and counts as a mistake. Turn it off in Settings for a stricter, old-school challenge where nothing is confirmed until the board is full.
+      <h3>Versus modes</h3>
+      In Practice vs Bot, Local 1v1/2v2 and Wager Match, players share one puzzle and take turns. A correct entry scores a point and keeps your turn — a wrong one is a foul and passes to the next player. Whoever completes the most cells correctly (or finishes the grid first) wins.
+      <h3>Levels</h3>
+      The Level campaign is a single, ongoing ladder — puzzles start easy and quietly get harder the further you go. There's no final level; it's built to keep going.
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:18px;" id="closeRulesBtn">Got it</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="helpOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">AUTO-CHECK</h1>
+    <div class="help-body">
+      Auto-Check instantly flags a wrong number in red the moment you place it, and it's what lets the turn-based versus modes work fairly (a wrong guess has to be visible right away so the turn can pass).
+      <br><br>
+      It's on by default in single-player modes too. If you'd rather solve without the safety net — nothing confirmed until the grid is full — flip it off here or in Settings. In versus modes it always stays on so turns can be scored.
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:18px;" id="closeHelpBtn">Got it</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="settingsOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">SETTINGS</h1>
+    <div class="settings-section-title" style="margin-top:0;">Gameplay</div>
+    <div class="toggle-row"><label>Auto-Check (flag wrong digits)</label><label class="switch"><input type="checkbox" id="trainerToggleSettings" checked><span class="sl"></span></label></div>
+    <div class="toggle-row"><label>Highlight same numbers</label><label class="switch"><input type="checkbox" id="highlightToggleSettings" checked><span class="sl"></span></label></div>
+    <div class="settings-section-title">Sound</div>
+    <div class="toggle-row"><label>Mute all sound</label><label class="switch"><input type="checkbox" id="muteAllChk"><span class="sl"></span></label></div>
+    <div class="toggle-row"><label>Preview: Ad-free (testing only)</label><label class="switch"><input type="checkbox" id="adsFreeChk"><span class="sl"></span></label></div>
+    <div class="toggle-row"><label>Background music</label><label class="switch"><input type="checkbox" id="musicToggle" checked><span class="sl"></span></label></div>
+    <div style="font-size:10px;opacity:0.5;margin:-4px 0 8px;">Generated live in your browser — original, royalty-free, plays softly from Home through every match.</div>
+    <div class="settings-section-title">Volume</div>
+    <div class="slider-row"><label>Music</label><input type="range" min="0" max="100" value="35" id="volMusic"><span class="val" id="valMusic">35</span></div>
+    <div class="slider-row"><label>Master</label><input type="range" min="0" max="100" value="90" id="volMaster"><span class="val" id="valMaster">90</span></div>
+    <div class="slider-row"><label>Placing</label><input type="range" min="0" max="100" value="80" id="volPlace"><span class="val" id="valPlace">80</span></div>
+    <div class="slider-row"><label>Mistakes</label><input type="range" min="0" max="100" value="85" id="volError"><span class="val" id="valError">85</span></div>
+    <div class="slider-row"><label>Completions</label><input type="range" min="0" max="100" value="90" id="volComplete"><span class="val" id="valComplete">90</span></div>
+    <div class="slider-row"><label>UI clicks</label><input type="range" min="0" max="100" value="60" id="volUi"><span class="val" id="valUi">60</span></div>
+    <div class="placeholder-note">Preferences apply to this session only. Account sync needs a connected server.</div>
+    <button class="btn" style="width:100%;margin-top:14px;" id="closeSettingsBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="equipOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">THEMES</h1>
+    <div class="tabbar">
+      <div class="tab active" data-tab="boards">Board Color</div>
+      <div class="tab" data-tab="numbers">Number Style</div>
+      <div class="tab" data-tab="highlight">Highlight</div>
+    </div>
+    <div id="tabBoards">
+      <p class="sub">Grid wood tone &amp; accent color — applies instantly.</p>
+      <div class="theme-grid" id="boardThemeGrid"></div>
+    </div>
+    <div id="tabNumbers" class="hidden">
+      <p class="sub">Unlock number colors with lifetime coins. Cosmetic only — the puzzles stay fair for everyone.</p>
+      <div class="striker-list" id="numberThemeList"></div>
+    </div>
+    <div id="tabHighlight" class="hidden">
+      <p class="sub">Selected-cell glow color — applies instantly.</p>
+      <div class="theme-grid" id="highlightThemeGrid"></div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:14px;" id="closeEquipBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="rankOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">RANK</h1>
+    <p class="sub">Tiers are based on lifetime diamonds earned.</p>
+    <div class="rank-ladder" id="rankLadder"></div>
+    <div class="section-title" style="margin-bottom:6px;">Leaderboard</div>
+    <div id="rankList"></div>
+    <div class="placeholder-note">Local, on-device preview only. A global leaderboard, friends and tournaments need account sync with a server.</div>
+    <button class="btn" style="width:100%;margin-top:14px;" id="closeRankBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="shopOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">SHOP</h1>
+    <p class="sub">Coins can be bought. Diamonds can only be earned by playing.</p>
+    <button class="btn primary" style="width:100%;" id="watchAdBtn">▶ Watch Ad — +250 🪙 (simulated)</button>
+    <div class="section-title" style="margin:16px 0 8px;">Go Ad-Free</div>
+    <div class="shop-item" style="width:100%;flex-direction:row;justify-content:space-between;padding:12px 14px;">
+      <div style="display:flex;align-items:center;gap:10px;"><div class="ic" style="font-size:22px;">🚫📺</div><div style="text-align:left;"><div class="n" style="font-size:12px;">Ad-Free Membership</div><div class="p" style="font-size:10px;opacity:0.6;">No interstitials, cancel anytime</div></div></div>
+      <button class="btn primary" id="subscribeAdFreeBtn" style="font-size:11px;padding:8px 12px;">$3.99/mo</button>
+    </div>
+    <div class="section-title" style="margin:16px 0 8px;">Coin Bundles</div>
+    <div class="shop-grid">
+      <div class="shop-item buy-item" data-price="$0.99"><div class="ic"><svg class="cur-icon" style="width:22px;height:22px;"><use href="#coinIcon"/></svg></div><div class="n">10,000 coins</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$0.99</button></div>
+      <div class="shop-item buy-item" data-price="$2.99"><div class="ic"><svg class="cur-icon" style="width:22px;height:22px;"><use href="#coinIcon"/></svg></div><div class="n">55,000 coins</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$2.99</button></div>
+      <div class="shop-item buy-item" data-price="$4.99"><div class="ic"><svg class="cur-icon" style="width:22px;height:22px;"><use href="#coinIcon"/></svg></div><div class="n">130,000 coins</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$4.99</button></div>
+      <div class="shop-item buy-item" data-price="$9.99"><div class="ic"><svg class="cur-icon" style="width:22px;height:22px;"><use href="#coinIcon"/></svg></div><div class="n">300,000 coins</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$9.99</button></div>
+      <div class="shop-item buy-item" data-price="$19.99"><div class="ic">💰</div><div class="n">750,000 coins</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$19.99</button></div>
+      <div class="shop-item buy-item" data-price="$39.99"><div class="ic">👑</div><div class="n">2,000,000 coins</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$39.99</button></div>
+    </div>
+    <div class="section-title" style="margin:16px 0 8px;">Bundles</div>
+    <div class="shop-grid">
+      <div class="shop-item buy-item" data-price="$4.99"><div class="ic">🎁</div><div class="n">Starter Pack — 25,000 🪙 + Ad-Free</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$4.99</button></div>
+      <div class="shop-item buy-item" data-price="$3.99"><div class="ic">💡</div><div class="n">10 Hints, instant unlock</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$3.99</button></div>
+    </div>
+    <div class="section-title" style="margin:16px 0 8px;">Exclusive Number Styles <span style="opacity:0.5;font-weight:400;">(real-money only — not earnable with coins)</span></div>
+    <div class="shop-grid">
+      <div class="shop-item buy-item" data-price="$5.99"><div class="ic">💎</div><div class="n">Prismatic digits</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$5.99</button></div>
+      <div class="shop-item buy-item" data-price="$5.99"><div class="ic">🌟</div><div class="n">Gold-leaf digits</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$5.99</button></div>
+    </div>
+    <div class="section-title" style="margin:16px 0 8px;">Victory Effects</div>
+    <div class="shop-grid">
+      <div class="shop-item buy-item" data-price="$2.49"><div class="ic">🎆</div><div class="n">Fireworks win animation</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$2.49</button></div>
+      <div class="shop-item buy-item" data-price="$2.49"><div class="ic">🏵️</div><div class="n">Confetti win animation</div><button class="btn buy-btn" style="font-size:10px;padding:6px 10px;margin-top:4px;">$2.49</button></div>
+    </div>
+    <div class="placeholder-note">Real purchases need a connected payment backend — every button here is wired up and ready, it just needs that backend behind it to actually charge anyone. Only "Watch Ad" works right now (simulated). Board Colors are unlockable with coins directly in Themes.</div>
+    <button class="btn" style="width:100%;margin-top:14px;" id="closeShopBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="editNameOverlay">
+  <div class="modal">
+    <h1 style="font-size:18px;">EDIT PROFILE</h1>
+    <p class="sub">This is local to your device until account sync is connected.</p>
+    <div style="display:flex;justify-content:center;margin-bottom:12px;">
+      <div id="avatarPreview" style="width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#0c2136,#1a3a55);display:flex;align-items:center;justify-content:center;font-size:34px;border:1px solid rgba(217,154,63,0.35);overflow:hidden;">🧑‍🎓</div>
+    </div>
+    <button class="btn primary" style="width:100%;margin-bottom:10px;" id="uploadAvatarBtn">📷 Upload Photo from Gallery</button>
+    <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+    <div style="font-size:10px;opacity:0.55;letter-spacing:0.5px;margin-bottom:6px;">OR PICK AN ICON</div>
+    <div id="avatarPresetGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;"></div>
+    <input type="text" id="editNameInput" maxlength="20" style="width:100%;padding:10px 12px;border-radius:9px;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);color:#dff7ff;font-family:'Space Grotesk',sans-serif;font-size:14px;text-align:center;">
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn" style="flex:1;" id="cancelNameBtn">Cancel</button>
+      <button class="btn primary" style="flex:1;" id="saveNameBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="wagerOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">WAGER MATCH</h1>
+    <p class="sub">Pick a stake. Win, and you take both stakes. Lose, and yours is gone.</p>
+    <div class="diff-row" style="margin-bottom:8px;">
+      <div class="diff-chip stake-chip" data-stake="500">500</div>
+      <div class="diff-chip stake-chip selected" data-stake="1000">1,000</div>
+      <div class="diff-chip stake-chip" data-stake="2500">2,500</div>
+      <div class="diff-chip stake-chip" data-stake="5000">5,000</div>
+    </div>
+    <div class="diff-row" style="margin-bottom:10px;">
+      <div class="diff-chip stake-chip" data-stake="10000">10,000</div>
+      <div class="diff-chip stake-chip" data-stake="25000">25,000</div>
+      <div class="diff-chip" id="allInBtn" style="color:var(--gold);border-color:rgba(255,210,63,0.4);">🔥 All In</div>
+    </div>
+    <div class="slider-row" style="margin-top:4px;">
+      <label>Custom (min 500)</label>
+      <input type="number" id="customStakeInput" min="500" step="500" placeholder="e.g. 3500" style="flex:1;padding:7px 10px;border-radius:8px;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);color:#dff7ff;font-family:'JetBrains Mono',monospace;">
+    </div>
+    <div style="font-size:11px;opacity:0.6;margin-top:6px;">Your balance: <span id="wagerBalanceTxt">0</span> 🪙 · Selected stake: <span id="selectedStakeTxt" style="color:var(--gold);font-family:'JetBrains Mono',monospace;">1,000</span> 🪙 · Win pays <span id="winPaysTxt" style="color:var(--gold);font-family:'JetBrains Mono',monospace;">2,000</span> 🪙</div>
+    <div class="placeholder-note">No real opponents are matched yet — that needs a live matchmaking server. Right now this stakes you against the CPU at your chosen difficulty so the scoring is fully real. Coins here have no cash payout; if this ever wagers real-money-purchased coins live, check gambling/skill-gaming rules for your region first — they vary a lot and often require licensing.</div>
+    <button class="btn primary" style="width:100%;margin-top:14px;" id="findOpponentBtn">🔎 Find Opponent</button>
+    <button class="btn" style="width:100%;margin-top:8px;" id="cancelWagerBtn">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="matchingOverlay">
+  <div class="modal" style="text-align:center;">
+    <div style="font-size:34px;margin-bottom:8px;" id="matchingSpinner">🔎</div>
+    <h1 style="font-size:16px;" id="matchingText">Searching for an opponent…</h1>
+    <p class="sub" id="matchingSub">Matching your stake</p>
+  </div>
+</div>
+
+<!-- Mock interstitial ad — swap the contents of #adCreative for a real AdMob/Google Ad Manager interstitial call. -->
+<div class="modal-overlay hidden" id="interstitialOverlay" style="z-index:80;background:#000;">
+  <div id="adCreative" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;background:linear-gradient(160deg,#0a1a2c,#02060c);">
+    <div style="position:absolute;top:14px;left:14px;font-size:10px;letter-spacing:1px;opacity:0.5;">ADVERTISEMENT</div>
+    <div style="font-size:44px;">📺</div>
+    <div style="font-family:'Poppins',sans-serif;color:var(--blue-bright);font-size:16px;margin-top:10px;letter-spacing:0.5px;font-weight:700;">Ad slot ready</div>
+    <div style="font-size:12px;opacity:0.6;max-width:280px;text-align:center;margin-top:8px;line-height:1.5;">This is a placeholder. Wire this container to your AdMob / Google Ad Manager interstitial unit — it already fires at the right moment (right after a match ends).</div>
+    <button class="btn primary" id="adSkipBtn" style="position:absolute;bottom:24px;padding:10px 22px;" disabled>Skip in <span id="adCountdown">5</span>s</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="streakOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">DAILY STREAK</h1>
+    <p class="sub">Come back each day for a bigger reward. Miss a day and it resets to Day 1.</p>
+    <div id="streakGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px;"></div>
+    <button class="btn primary" style="width:100%;margin-top:12px;" id="claimStreakBtn">Claim Day 1</button>
+    <div class="placeholder-note">The 24-hour countdown is real — it'll hold as long as this tab stays open. It resets on reload though, since there's no account server yet to remember your streak between visits.</div>
+    <button class="btn" style="width:100%;margin-top:10px;" id="closeStreakBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="multiplayerOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;">MULTIPLAYER</h1>
+    <p class="sub">This is a working preview of the flow — it needs a live matchmaking server behind it before real players can actually connect. See the note below for what that takes.</p>
+    <div class="mode-card" id="randomMatchBtn" style="margin-bottom:10px;">
+      <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="9"/><path d="M8 8h.01M16 8h.01M8 16h.01M16 16h.01M12 12h.01"/></svg></div>
+      <div class="mt"><div class="n">Random Match</div><div class="d">Get paired with anyone online</div></div>
+    </div>
+    <div class="mode-card" id="customRoomBtn">
+      <div class="mi"><svg viewBox="0 0 24 24" class="svg-icon"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+      <div class="mt"><div class="n">Custom Room</div><div class="d">Invite up to 3 friends by ID</div></div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:14px;" id="closeMultiplayerBtn">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="lobbyOverlay">
+  <div class="modal">
+    <h1 style="font-size:20px;" id="lobbyTitle">CUSTOM ROOM</h1>
+    <p class="sub" id="lobbySub">Share your ID or enter a friend's to invite them.</p>
+
+    <div id="lobbyIdRow" style="display:flex;align-items:center;gap:8px;background:rgba(217,154,63,0.08);border:1px solid var(--panel-border);border-radius:10px;padding:10px 12px;margin-bottom:10px;">
+      <div style="flex:1;text-align:left;">
+        <div style="font-size:10px;opacity:0.6;letter-spacing:0.5px;">YOUR ID</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;" id="myPlayerId">SC-000000</div>
+      </div>
+      <button class="btn" id="copyIdBtn">Copy</button>
+    </div>
+
+    <div id="inviteRow" style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="text" id="inviteIdInput" placeholder="Friend's ID, e.g. SC-482913" style="flex:1;padding:9px 10px;border-radius:9px;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);color:#f3e6d6;font-family:'JetBrains Mono',monospace;font-size:12px;">
+      <button class="btn primary" id="sendInviteBtn">Invite</button>
+    </div>
+
+    <div class="section-title" style="margin-bottom:8px;">Room (<span id="lobbyCount">1</span>/4)</div>
+    <div id="lobbySlots" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+
+    <div class="placeholder-note">Real invites and matchmaking here need a signaling server plus persistent player accounts to issue these IDs for real. That's a bigger build than the other server-dependent pieces in this app — worth planning as its own project rather than a quick add-on. Everything above is the ready-made front end for it.</div>
+
+    <button class="btn primary" style="width:100%;margin-top:14px;" id="startLobbyMatchBtn" disabled>Start Match (needs 2+ real players)</button>
+    <button class="btn" style="width:100%;margin-top:8px;" id="closeLobbyBtn">Leave Room</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+// ================= Sudoku engine =================
+function shuffled(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function boxOf(idx){ const r=(idx/9)|0, c=idx%9; return ((r/3)|0)*3 + ((c/3)|0); }
+const PEERS = (()=>{ const p=[]; for(let i=0;i<81;i++){ const r=(i/9)|0,c=i%9,b=boxOf(i); const set=new Set();
+  for(let k=0;k<9;k++){ set.add(r*9+k); set.add(k*9+c); }
+  const br=((b/3)|0)*3, bc=(b%3)*3;
+  for(let dr=0;dr<3;dr++) for(let dc=0;dc<3;dc++) set.add((br+dr)*9+(bc+dc));
+  set.delete(i); p.push([...set]); } return p; })();
+
+function generateSolved(){
+  const board = new Array(81).fill(0);
+  function fill(pos){
+    if(pos===81) return true;
+    if(board[pos]!==0) return fill(pos+1);
+    const cands = shuffled([1,2,3,4,5,6,7,8,9]);
+    for(const d of cands){
+      if(PEERS[pos].every(p=>board[p]!==d)){
+        board[pos]=d;
+        if(fill(pos+1)) return true;
+        board[pos]=0;
+      }
+    }
+    return false;
+  }
+  fill(0);
+  return board;
+}
+
+function countSolutions(board, limit){
+  const b = board.slice();
+  let count = 0;
+  function candidates(pos){
+    const used = new Set(PEERS[pos].map(p=>b[p]).filter(v=>v!==0));
+    const out=[]; for(let d=1;d<=9;d++) if(!used.has(d)) out.push(d); return out;
+  }
+  function solve(){
+    if(count>=limit) return;
+    let best=-1, bestCands=null;
+    for(let i=0;i<81;i++){
+      if(b[i]===0){
+        const c = candidates(i);
+        if(c.length===0) return;
+        if(best===-1 || c.length<bestCands.length){ best=i; bestCands=c; if(c.length===1) break; }
+      }
+    }
+    if(best===-1){ count++; return; }
+    for(const d of bestCands){
+      b[best]=d;
+      solve();
+      b[best]=0;
+      if(count>=limit) return;
+    }
+  }
+  solve();
+  return count;
+}
+
+function generatePuzzle(clues){
+  const solution = generateSolved();
+  const board = solution.slice();
+  const positions = shuffled([...Array(81).keys()]);
+  let removed = 0;
+  const target = 81 - clues;
+  for(const pos of positions){
+    if(removed>=target) break;
+    const saved = board[pos];
+    board[pos] = 0;
+    const c = countSolutions(board, 2);
+    if(c===1){ removed++; } else { board[pos]=saved; }
+  }
+  return { puzzle: board, solution, clues: 81-removed };
+}
+
+function cluesForDifficulty(diff){
+  return { easy:44, medium:34, hard:29, expert:25 }[diff] || 34;
+}
+function cluesForLevel(level){
+  let c = 46 - Math.floor((level-1)*0.8);
+  return Math.max(24, Math.min(46, c));
+}
+function diffLabelForLevel(level){
+  const c = cluesForLevel(level);
+  if(c>=40) return 'Easy'; if(c>=32) return 'Medium'; if(c>=26) return 'Hard'; return 'Expert';
+}
+
+// ================= Persistent-ish state (session only) =================
+let profile = { name:'Guest_'+String(Math.floor(Math.random()*999999)).padStart(6,'0'), avatar:'🧑‍🎓', coins:1200, diamonds:0, lifetimeDiamonds:0, level:1, winStreak:0, playerId:'SC-'+String(Math.floor(Math.random()*999999)).padStart(6,'0') };
+let settings = { autoCheck:true, highlightSame:true, muted:false, adsFree:false, music:true,
+  vol:{ master:0.9, place:0.8, error:0.85, complete:0.9, ui:0.6, music:0.35 } };
+let boardTheme = 0, numberTheme = 0, highlightTheme = 0;
+let ownedNumberThemes = new Set([0]);
+
+const BOARD_THEMES = [
+  { name:'Amber Oak', a:'#d99a3f', b:'#b23a2f' },
+  { name:'Slate Teal', a:'#3f9ad9', b:'#2f8fb2' },
+  { name:'Jade Night', a:'#3fd98a', b:'#2f6b3a' },
+  { name:'Violet Dusk', a:'#a83fd9', b:'#5a2fb2' },
+];
+const HIGHLIGHT_THEMES = [
+  { name:'Gold', c:'#ffd23f' }, { name:'Cyan', c:'#7ae0ff' }, { name:'Rose', c:'#ff7a9e' }, { name:'Lime', c:'#c6ff7a' },
+];
+const NUMBER_THEMES = [
+  { name:'Classic Blue', color:'#8fd3ff', price:0 },
+  { name:'Sunrise', color:'#ffb37a', price:8000 },
+  { name:'Mint', color:'#7affc4', price:8000 },
+  { name:'Rose Gold', color:'#ffc4d6', price:15000 },
+  { name:'Violet', color:'#c9a3ff', price:15000 },
+  { name:'Onyx White', color:'#f5f5f5', price:30000 },
+];
+
+const RANK_TIERS = [
+  { name:'Rookie', icon:'🥉', need:0 },
+  { name:'Solver', icon:'🥈', need:20 },
+  { name:'Strategist', icon:'🥇', need:60 },
+  { name:'Logician', icon:'🏆', need:150 },
+  { name:'Grandmaster', icon:'💎', need:350 },
+  { name:'Sudoku Legend', icon:'👑', need:800 },
+];
+
+// ================= Audio ================= (procedural, same engine pattern as Carrom Clash)
+let actx=null, masterGain=null, catGains={}, muted=false;
+function ensureAudio(){
+  if(!actx){
+    actx = new (window.AudioContext||window.webkitAudioContext)();
+    masterGain = actx.createGain(); masterGain.gain.value = muted?0:settings.vol.master; masterGain.connect(actx.destination);
+    ['place','error','complete','ui','music'].forEach(k=>{ const g=actx.createGain(); g.gain.value=settings.vol[k]; g.connect(masterGain); catGains[k]=g; });
+    if(settings.music){ startMusic(); }
+  }
+  return actx;
+}
+function setMuted(m){ muted=m; if(masterGain) masterGain.gain.setTargetAtTime(muted?0:settings.vol.master, actx.currentTime, 0.02); }
+function setVol(key,v01){ settings.vol[key]=v01; if(key==='master'){ if(masterGain && !muted) masterGain.gain.setTargetAtTime(v01, actx.currentTime, 0.02);} else if(catGains[key]){ catGains[key].gain.setTargetAtTime(v01, actx.currentTime, 0.02);} }
+
+function playUIClick(){
+  const ctx=ensureAudio(); const t0=ctx.currentTime;
+  const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.type='sine';
+  osc.frequency.setValueAtTime(720,t0); osc.frequency.exponentialRampToValueAtTime(480,t0+0.05);
+  gain.gain.setValueAtTime(0.0001,t0); gain.gain.exponentialRampToValueAtTime(0.16,t0+0.004); gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.07);
+  osc.connect(gain); gain.connect(catGains.ui); osc.start(t0); osc.stop(t0+0.08);
+}
+function playPlace(correct){
+  const ctx=ensureAudio(); const t0=ctx.currentTime;
+  const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.type='triangle';
+  const f = correct? 660 : 400;
+  osc.frequency.setValueAtTime(f,t0);
+  gain.gain.setValueAtTime(0.0001,t0); gain.gain.exponentialRampToValueAtTime(0.16,t0+0.006); gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.13);
+  osc.connect(gain); gain.connect(catGains.place); osc.start(t0); osc.stop(t0+0.15);
+}
+function playError(){
+  const ctx=ensureAudio(); const t0=ctx.currentTime;
+  const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.type='sawtooth';
+  osc.frequency.setValueAtTime(180,t0); osc.frequency.exponentialRampToValueAtTime(90,t0+0.18);
+  gain.gain.setValueAtTime(0.0001,t0); gain.gain.exponentialRampToValueAtTime(0.2,t0+0.01); gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.2);
+  osc.connect(gain); gain.connect(catGains.error); osc.start(t0); osc.stop(t0+0.22);
+}
+function playComplete(big){
+  const ctx=ensureAudio(); const t0=ctx.currentTime;
+  const notes = big? [523.3,659.3,784.0,1046.5] : [659.3,784.0];
+  notes.forEach((f,i)=>{
+    const delay=i*0.09;
+    const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.type='triangle';
+    osc.frequency.setValueAtTime(f,t0+delay);
+    gain.gain.setValueAtTime(0.0001,t0+delay); gain.gain.exponentialRampToValueAtTime(0.2,t0+delay+0.012); gain.gain.exponentialRampToValueAtTime(0.0001,t0+delay+0.3);
+    osc.connect(gain); gain.connect(catGains.complete); osc.start(t0+delay); osc.stop(t0+delay+0.32);
+  });
+}
+function playHint(){
+  const ctx=ensureAudio(); const t0=ctx.currentTime;
+  const osc=ctx.createOscillator(); const gain=ctx.createGain(); osc.type='sine';
+  osc.frequency.setValueAtTime(880,t0); osc.frequency.exponentialRampToValueAtTime(1320,t0+0.12);
+  gain.gain.setValueAtTime(0.0001,t0); gain.gain.exponentialRampToValueAtTime(0.14,t0+0.01); gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.16);
+  osc.connect(gain); gain.connect(catGains.ui); osc.start(t0); osc.stop(t0+0.18);
+}
+let musicNodes=[], musicTimer=null;
+const MUSIC_CHORDS=[[130.8,164.8,196],[146.8,174.6,220],[110,146.8,174.6],[123.5,164.8,196]];
+function startMusic(){
+  if(!settings.music) return; const ctx=ensureAudio(); stopMusic();
+  const chord = MUSIC_CHORDS[Math.floor(Math.random()*MUSIC_CHORDS.length)];
+  chord.forEach((freq,i)=>{
+    const osc=ctx.createOscillator(); osc.type = i===0?'sine':'triangle'; osc.frequency.value=freq;
+    const g=ctx.createGain(); g.gain.value=0.0001;
+    const filt=ctx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=850;
+    osc.connect(filt); filt.connect(g); g.connect(catGains.music);
+    const t0=ctx.currentTime; g.gain.linearRampToValueAtTime(0.08/chord.length, t0+2.5); osc.start(t0);
+    musicNodes.push({osc,g});
+  });
+  musicTimer = setTimeout(startMusic, 6500);
+}
+function stopMusic(){
+  if(musicTimer){ clearTimeout(musicTimer); musicTimer=null; }
+  const ctx=actx;
+  musicNodes.forEach(({osc,g})=>{ try{ if(ctx){ const t0=ctx.currentTime; g.gain.setTargetAtTime(0.0001,t0,0.3); osc.stop(t0+1); } else osc.stop(); }catch(e){} });
+  musicNodes=[];
+}
+function vibrate(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+
+// ================= Match state =================
+let mode = 'levels'; // levels | bot | 2 | 4 | wager
+let difficulty = 'medium';
+let puzzle=null, solution=null, board=null, given=null, notes=null, owner=null;
+let selected=-1, notesMode=false, history=[];
+let players=[], currentPlayerIdx=0, mistakes=0, hintsUsed=0, gameOver=false, matchStartTime=0, timerInt=null;
+let wagerActive=false, wagerStake=0, selectedStake=1000;
+let botTimer=null;
+const MAX_MISTAKES_SOLO = 3;
+
+function newGameSetup(newMode, diff){
+  mode = newMode; difficulty = diff || difficulty;
+  let clues;
+  if(mode==='levels') clues = cluesForLevel(profile.level);
+  else clues = cluesForDifficulty(difficulty);
+
+  const gen = generatePuzzle(clues);
+  puzzle = gen.puzzle.slice(); solution = gen.solution; board = gen.puzzle.slice();
+  given = board.map(v=>v!==0);
+  notes = new Array(81).fill(0).map(()=>new Set());
+  owner = new Array(81).fill(-1);
+  selected=-1; notesMode=false; history=[];
+  mistakes=0; hintsUsed=0; gameOver=false;
+
+  if(mode==='2'){ players=[ {id:0,name:'Player 1',team:0,score:0,isBot:false}, {id:1,name:'Player 2',team:1,score:0,isBot:false} ]; }
+  else if(mode==='4'){ players=[ {id:0,name:'P1',team:0,score:0,isBot:false}, {id:1,name:'P2',team:1,score:0,isBot:false}, {id:2,name:'P3',team:0,score:0,isBot:false}, {id:3,name:'P4',team:1,score:0,isBot:false} ]; }
+  else if(mode==='bot' || mode==='wager'){ players=[ {id:0,name:'You',team:0,score:0,isBot:false}, {id:1,name:'CPU',team:1,score:0,isBot:true} ]; }
+  else { players=[ {id:0,name:'You',team:0,score:0,isBot:false} ]; }
+  currentPlayerIdx=0;
+
+  document.getElementById('scoreboard').classList.toggle('hidden', players.length<=1);
+  renderScoreboard();
+  renderStatRow();
+  renderGrid();
+  renderNumpad();
+  updateTrainerBadge();
+  updateTitle();
+  document.getElementById('winnerBanner').classList.remove('show');
+
+  const stakeBadge=document.getElementById('stakeBadge');
+  if(wagerActive){ stakeBadge.textContent=`💰 Staked: ${wagerStake.toLocaleString()}`; stakeBadge.classList.remove('hidden'); } else stakeBadge.classList.add('hidden');
+
+  matchStartTime = Date.now();
+  if(timerInt) clearInterval(timerInt);
+  timerInt = setInterval(()=>{ if(!gameOver) renderStatRow(); }, 1000);
+
+  const sweep=document.getElementById('matchSweep'); sweep.classList.remove('play'); void sweep.offsetWidth; sweep.classList.add('play');
+  showMsg(players.length>1 ? `${players[0].name}'s turn` : 'Good luck!', 1400);
+  if(players.length>1) playUIClick();
+  maybeScheduleBot();
+}
+
+function updateTitle(){
+  const t=document.getElementById('matchTitle');
+  const diffTxt = mode==='levels'? diffLabelForLevel(profile.level) : (difficulty[0].toUpperCase()+difficulty.slice(1));
+  const modeTxt = {levels:`Level ${profile.level}`, bot:'Practice vs Bot', '2':'Local 1v1', '4':'Local 2v2', wager:'Wager Match'}[mode];
+  t.textContent = `${modeTxt} · ${diffTxt}`;
+}
+
+function updateTrainerBadge(){
+  const badge=document.getElementById('trainerBadge');
+  const forced = players.length>1;
+  badge.classList.toggle('hidden', !(settings.autoCheck||forced));
+  badge.textContent = (settings.autoCheck||forced) ? '✓ AUTO-CHECK ON' : '';
+}
+
+// ---- Rendering ----
+function cellClasses(i){
+  const r=(i/9)|0;
+  let cls='sud-cell';
+  if(r%3===0) cls+=' row0'; if(r%3===2) cls+=' row3n';
+  if(given[i]) cls+=' given'; else if(board[i]!==0) cls+=' userfill';
+  if(i===selected) cls+=' selected';
+  else if(selected>=0 && settings.highlightSame){
+    const r0=(selected/9)|0,c0=selected%9,b0=boxOf(selected);
+    const r1=(i/9)|0,c1=i%9,b1=boxOf(i);
+    if(r0===r1||c0===c1||b0===b1) cls+=' peer';
+    if(board[selected]!==0 && board[i]===board[selected] && i!==selected) cls+=' samenum';
+  }
+  if(owner[i]===1) cls+=' owner1';
+  return cls;
+}
+function renderGrid(){
+  const grid=document.getElementById('sudokuGrid'); grid.innerHTML='';
+  for(let i=0;i<81;i++){
+    const div=document.createElement('div');
+    div.className=cellClasses(i); div.dataset.idx=i;
+    if(board[i]!==0){ div.textContent=board[i]; }
+    else if(notes[i] && notes[i].size){
+      const ng=document.createElement('div'); ng.className='notes-grid';
+      for(let d=1;d<=9;d++){ const s=document.createElement('span'); s.textContent = notes[i].has(d)?d:''; ng.appendChild(s); }
+      div.appendChild(ng);
+    }
+    div.addEventListener('click', ()=>onCellTap(i));
+    grid.appendChild(div);
+  }
+}
+function refreshGridClasses(){
+  document.querySelectorAll('.sud-cell').forEach(el=>{
+    const i=+el.dataset.idx;
+    el.className = cellClasses(i);
+  });
+}
+function renderCell(i){
+  const el=document.querySelector(`.sud-cell[data-idx="${i}"]`);
+  if(!el) return;
+  el.innerHTML='';
+  el.className=cellClasses(i);
+  if(board[i]!==0){ el.textContent=board[i]; }
+  else if(notes[i] && notes[i].size){
+    const ng=document.createElement('div'); ng.className='notes-grid';
+    for(let d=1;d<=9;d++){ const s=document.createElement('span'); s.textContent = notes[i].has(d)?d:''; ng.appendChild(s); }
+    el.appendChild(ng);
+  }
+}
+function renderNumpad(){
+  const np=document.getElementById('numpad'); np.innerHTML='';
+  for(let d=1;d<=9;d++){
+    const btn=document.createElement('div'); btn.className='num-btn'; btn.dataset.d=d;
+    btn.innerHTML=`${d}<span class="cnt">${remainingCount(d)}</span>`;
+    btn.addEventListener('click', ()=>onDigitTap(d));
+    np.appendChild(btn);
+  }
+  updateNumpadCounts();
+}
+function remainingCount(d){ let placed=0; for(let i=0;i<81;i++) if(board[i]===d) placed++; return Math.max(0,9-placed); }
+function updateNumpadCounts(){
+  document.querySelectorAll('.num-btn').forEach(btn=>{
+    const d=+btn.dataset.d; const rem=remainingCount(d);
+    btn.querySelector('.cnt').textContent=rem;
+    btn.classList.toggle('done', rem===0);
+  });
+}
+function renderScoreboard(){
+  const el=document.getElementById('scoreboard'); el.innerHTML='';
+  if(players.length<=1) return;
+  players.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='pcard'+(i===currentPlayerIdx && !gameOver?' active':'');
+    const sw = p.team===0?'sw-white':'sw-black';
+    div.innerHTML=`<div class="pname"><span class="swatch ${sw}"></span>${p.name}${p.isBot?' 🤖':''}</div><div class="pscore">${teamTotal(p.team)}</div>`;
+    el.appendChild(div);
+  });
+}
+function teamTotal(team){ return players.filter(p=>p.team===team).reduce((s,p)=>s+p.score,0); }
+function renderStatRow(){
+  const el=document.getElementById('statRow'); el.innerHTML='';
+  const elapsed = Math.floor((Date.now()-matchStartTime)/1000);
+  const mm=String(Math.floor(elapsed/60)).padStart(2,'0'), ss=String(elapsed%60).padStart(2,'0');
+  const filled = board.filter(v=>v!==0).length;
+  function pill(v,l,warn){ const d=document.createElement('div'); d.className='stat-pill'+(warn?' warn':''); d.innerHTML=`<div class="v">${v}</div><div class="l">${l}</div>`; return d; }
+  el.appendChild(pill(`${mm}:${ss}`,'Time'));
+  el.appendChild(pill(`${filled}/81`,'Filled'));
+  if(players.length<=1){ el.appendChild(pill(`${mistakes}/${MAX_MISTAKES_SOLO}`,'Mistakes', mistakes>0)); }
+  el.appendChild(pill(`${profile.coins.toLocaleString()}`,'Coins'));
+}
+
+// ---- Interaction ----
+function onCellTap(i){
+  ensureAudio();
+  if(gameOver) return;
+  selected=i; refreshGridClasses();
+  playUIClick();
+}
+function pushHistory(i){ history.push({ i, val: board[i], notes: new Set(notes[i]) }); if(history.length>60) history.shift(); }
+
+function onDigitTap(d){
+  ensureAudio();
+  if(gameOver || selected<0) return;
+  if(given[selected]) { showMsg("Can't change a given number", 1100); return; }
+  playUIClick();
+  if(notesMode){
+    if(board[selected]!==0) return;
+    pushHistory(selected);
+    if(notes[selected].has(d)) notes[selected].delete(d); else notes[selected].add(d);
+    renderCell(selected);
+    return;
+  }
+  placeDigit(selected, d);
+}
+function placeDigit(i, d){
+  pushHistory(i);
+  const correct = (d === solution[i]);
+  const forceCheck = players.length>1 || settings.autoCheck;
+
+  if(forceCheck){
+    if(correct){
+      board[i]=d; notes[i].clear(); owner[i]=currentPlayerIdx;
+      playPlace(true); vibrate(10);
+      afterCorrectPlacement(i);
+    } else {
+      mistakes++;
+      playError(); vibrate([0,40,40,40]);
+      flashConflict(i);
+      afterMistake();
+    }
+  } else {
+    // Auto-check off: place blind, no immediate judgement
+    board[i]=d; notes[i].clear(); owner[i]=currentPlayerIdx;
+    playPlace(correct);
+    renderCell(i); updateNumpadCounts();
+    checkBoardFullSolo();
+  }
+}
+function flashConflict(i){
+  const el=document.querySelector(`.sud-cell[data-idx="${i}"]`);
+  if(el){ el.classList.add('conflict'); setTimeout(()=>{ if(el) el.classList.remove('conflict'); refreshGridClasses(); }, 260); }
+}
+function afterCorrectPlacement(i){
+  renderCell(i); refreshGridClasses(); updateNumpadCounts();
+  const wasBoxDone = isBoxComplete(i), wasRowDone = isRowComplete(i), wasColDone = isColComplete(i);
+  if(wasBoxDone||wasRowDone||wasColDone) playComplete(false);
+
+  if(players.length>1){
+    players[currentPlayerIdx].score++;
+    renderScoreboard();
+    showMsg('Correct! Go again', 900);
+  }
+  if(isSolved()){ endMatch(); return; }
+  renderStatRow();
+}
+function afterMistake(){
+  refreshGridClasses();
+  if(players.length>1){
+    showMsg(`Foul — ${players[currentPlayerIdx].name} loses the turn`, 1300);
+    advanceTurn();
+  } else {
+    showMsg('Not quite — try again', 1100);
+    if(mistakes>=MAX_MISTAKES_SOLO){ loseSolo(); return; }
+  }
+  renderStatRow();
+}
+function checkBoardFullSolo(){
+  if(board.every(v=>v!==0)){
+    if(board.every((v,i)=>v===solution[i])) endMatch();
+    else showMsg('Not quite — check your board', 1800);
+  }
+}
+function isRowComplete(i){ const r=(i/9)|0; for(let c=0;c<9;c++) if(board[r*9+c]===0) return false; return true; }
+function isColComplete(i){ const c=i%9; for(let r=0;r<9;r++) if(board[r*9+c]===0) return false; return true; }
+function isBoxComplete(i){ const b=boxOf(i); const br=((b/3)|0)*3, bc=(b%3)*3; for(let dr=0;dr<3;dr++) for(let dc=0;dc<3;dc++) if(board[(br+dr)*9+(bc+dc)]===0) return false; return true; }
+function isSolved(){ return board.every((v,i)=>v===solution[i]); }
+
+function advanceTurn(){
+  currentPlayerIdx = (currentPlayerIdx+1) % players.length;
+  renderScoreboard();
+  if(players[currentPlayerIdx].isBot){ scheduleBotMove(); }
+}
+function maybeScheduleBot(){ if(players[currentPlayerIdx] && players[currentPlayerIdx].isBot) scheduleBotMove(); }
+function scheduleBotMove(){
+  if(botTimer) clearTimeout(botTimer);
+  const speed = { easy:1400, medium:1000, hard:700, expert:500 }[difficulty] || 1000;
+  botTimer = setTimeout(()=>{
+    if(gameOver) return;
+    const empties=[]; for(let i=0;i<81;i++) if(board[i]===0) empties.push(i);
+    if(empties.length===0) return;
+    const cell = empties[(Math.random()*empties.length)|0];
+    const accuracy = { easy:0.55, medium:0.72, hard:0.85, expert:0.95 }[difficulty] || 0.75;
+    let digit;
+    if(Math.random()<accuracy) digit = solution[cell];
+    else { do{ digit=1+((Math.random()*9)|0); } while(digit===solution[cell]); }
+    selected=cell; refreshGridClasses();
+    placeDigit(cell, digit);
+  }, speed + Math.random()*400);
+}
+
+function undo(){
+  ensureAudio(); playUIClick();
+  if(!history.length){ showMsg('Nothing to undo',900); return; }
+  const last = history.pop();
+  board[last.i]=last.val; notes[last.i]=last.notes;
+  renderCell(last.i); refreshGridClasses(); updateNumpadCounts();
+}
+function eraseCell(){
+  ensureAudio(); playUIClick();
+  if(selected<0 || given[selected]) return;
+  pushHistory(selected);
+  board[selected]=0; notes[selected].clear(); owner[selected]=-1;
+  renderCell(selected); refreshGridClasses(); updateNumpadCounts();
+}
+function useHint(){
+  ensureAudio();
+  if(gameOver) return;
+  const cost=40;
+  if(profile.coins<cost){ showMsg('Not enough coins for a hint',1300); return; }
+  let cell = selected>=0 && board[selected]===0 ? selected : -1;
+  if(cell<0){ const empties=[]; for(let i=0;i<81;i++) if(board[i]===0) empties.push(i); if(!empties.length) return; cell=empties[(Math.random()*empties.length)|0]; }
+  profile.coins-=cost; hintsUsed++;
+  pushHistory(cell);
+  board[cell]=solution[cell]; notes[cell].clear(); owner[cell]=currentPlayerIdx;
+  selected=cell;
+  playHint();
+  const el=document.querySelector(`.sud-cell[data-idx="${cell}"]`);
+  renderCell(cell); refreshGridClasses(); updateNumpadCounts(); updateCurrencyUI();
+  const el2=document.querySelector(`.sud-cell[data-idx="${cell}"]`); if(el2){ el2.classList.add('hinted'); setTimeout(()=>el2.classList.remove('hinted'),1000); }
+  if(isSolved()) endMatch();
+}
+
+function loseSolo(){
+  gameOver=true; clearInterval(timerInt); if(botTimer) clearTimeout(botTimer);
+  document.getElementById('winnerText').textContent='Out of Mistakes';
+  document.getElementById('rewardLine').textContent = 'No reward this round';
+  document.getElementById('wagerLine').classList.add('hidden');
+  const elapsed=Math.floor((Date.now()-matchStartTime)/1000);
+  document.getElementById('statsLine').textContent = `${Math.floor(elapsed/60)}:${String(elapsed%60).padStart(2,'0')} · ${mistakes} mistakes`;
+  document.getElementById('playAgainBtn').textContent='Try Again';
+  document.getElementById('winnerBanner').classList.add('show');
+  profile.winStreak=0; updateProfileUI();
+}
+
+function endMatch(){
+  gameOver=true; clearInterval(timerInt); if(botTimer) clearTimeout(botTimer);
+  playComplete(true); vibrate([0,60,40,60]);
+  const elapsed=Math.floor((Date.now()-matchStartTime)/1000);
+  let coinsReward=0, diamondsReward=0, resultText='Puzzle Solved!';
+
+  if(players.length<=1){
+    const base = { easy:80, medium:140, hard:220, expert:320 }[mode==='levels'?diffLabelForLevel(profile.level).toLowerCase():difficulty] || 140;
+    const mistakePenalty = Math.max(0.4, 1-mistakes*0.15);
+    const hintPenalty = Math.max(0.3, 1-hintsUsed*0.15);
+    coinsReward = Math.round(base*mistakePenalty*hintPenalty);
+    diamondsReward = Math.max(1, Math.round(base/70));
+    if(mode==='levels'){ profile.level++; resultText = `Level ${profile.level-1} Complete!`; }
+    profile.winStreak++;
+  } else {
+    const totals = [0,1].map(t=>teamTotal(t));
+    const won = totals[0]>=totals[1];
+    resultText = won ? 'You Win!' : 'CPU/Rival Wins';
+    if(won){
+      coinsReward = { easy:100, medium:160, hard:240, expert:340 }[difficulty] || 160;
+      diamondsReward = 3;
+      profile.winStreak++;
+    } else {
+      coinsReward = 20; diamondsReward = 0; profile.winStreak=0;
+    }
+    if(wagerActive){
+      const wagerWinnings = won ? wagerStake*2 : 0;
+      profile.coins += (won? wagerStake : -wagerStake);
+      document.getElementById('wagerLine').textContent = won? `+${wagerStake.toLocaleString()} 🪙 stake won!` : `-${wagerStake.toLocaleString()} 🪙 stake lost`;
+      document.getElementById('wagerLine').classList.remove('hidden');
+      wagerActive=false;
+    } else {
+      document.getElementById('wagerLine').classList.add('hidden');
+    }
+  }
+
+  profile.coins += coinsReward; profile.diamonds += diamondsReward; profile.lifetimeDiamonds += diamondsReward;
+  updateProfileUI(); updateCurrencyUI();
+
+  document.getElementById('winnerText').textContent = resultText;
+  document.getElementById('rewardLine').textContent = `+${coinsReward} 🪙 · +${diamondsReward} 💎`;
+  document.getElementById('statsLine').textContent = `${Math.floor(elapsed/60)}:${String(elapsed%60).padStart(2,'0')} · ${mistakes} mistakes`;
+  document.getElementById('playAgainBtn').textContent = mode==='levels' ? 'Next Level' : 'Play Again';
+  document.getElementById('winnerBanner').classList.add('show');
+}
+
+// ---- Home UI ----
+function updateProfileUI(){
+  document.getElementById('profileName').textContent = profile.name;
+  document.getElementById('levelNum').textContent = profile.level;
+  document.getElementById('avatarIcon').textContent = profile.avatar;
+  document.getElementById('avatarPreview').textContent = profile.avatar;
+  let tier = RANK_TIERS[0], next=RANK_TIERS[1];
+  for(let i=0;i<RANK_TIERS.length;i++){ if(profile.lifetimeDiamonds>=RANK_TIERS[i].need){ tier=RANK_TIERS[i]; next=RANK_TIERS[i+1]||null; } }
+  document.getElementById('rankBadgeIcon').textContent = tier.icon;
+  document.getElementById('rankBadgeName').textContent = tier.name;
+  document.getElementById('rankDiamondsTxt').textContent = profile.lifetimeDiamonds;
+  const pct = next ? Math.min(100, Math.round(((profile.lifetimeDiamonds-tier.need)/(next.need-tier.need))*100)) : 100;
+  document.getElementById('rankProgressFill').style.width = pct+'%';
+  const streakLine=document.getElementById('streakLine');
+  if(profile.winStreak>0){ streakLine.classList.remove('hidden'); streakLine.textContent = `🔥 Win Streak: ${profile.winStreak}`; } else streakLine.classList.add('hidden');
+}
+function updateCurrencyUI(){
+  document.getElementById('coinTotal').textContent = profile.coins.toLocaleString();
+  document.getElementById('diamondTotal').textContent = profile.diamonds.toLocaleString();
+}
+
+let msgTimer=null;
+function showMsg(text,dur=1600){
+  const el=document.getElementById('hudMsg'); el.textContent=text; el.classList.add('show');
+  if(msgTimer) clearTimeout(msgTimer);
+  msgTimer=setTimeout(()=>el.classList.remove('show'), dur);
+}
+
+// ================= Navigation =================
+const homeScreen=document.getElementById('homeScreen');
+const matchScreen=document.getElementById('matchScreen');
+function goHome(){
+  clearInterval(timerInt); if(botTimer) clearTimeout(botTimer);
+  matchScreen.classList.add('hidden'); homeScreen.classList.remove('hidden');
+  updateProfileUI(); updateCurrencyUI();
+}
+function goToMatch(newMode, diff){
+  homeScreen.classList.add('hidden'); matchScreen.classList.remove('hidden');
+  document.getElementById('matchingText').textContent='Generating puzzle…';
+  document.getElementById('matchingSub').textContent='Shuffling a fresh grid, hold on';
+  document.getElementById('matchingOverlay').classList.remove('hidden');
+  setTimeout(()=>{
+    document.getElementById('matchingOverlay').classList.add('hidden');
+    newGameSetup(newMode, diff);
+  }, 40);
+}
+
+document.querySelectorAll('[data-mode]').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    ensureAudio(); playUIClick();
+    const m=card.dataset.mode;
+    goToMatch(m, difficulty);
+  });
+});
+document.getElementById('exitMatchBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); goHome(); });
+document.getElementById('homeFromWinBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); goHome(); });
+document.getElementById('playAgainBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); goToMatch(mode, difficulty); });
+
+document.getElementById('diffRow').addEventListener('click', (e)=>{
+  const chip=e.target.closest('.diff-chip'); if(!chip) return;
+  ensureAudio(); playUIClick();
+  document.querySelectorAll('#diffRow .diff-chip').forEach(c=>c.classList.remove('selected'));
+  chip.classList.add('selected'); difficulty=chip.dataset.diff;
+});
+
+document.getElementById('quickMuteBtn').addEventListener('click', (e)=>{
+  ensureAudio(); muted=!muted; setMuted(muted); e.target.textContent = muted?'🔇':'🔊';
+});
+
+// ---- Tools ----
+document.getElementById('notesBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  notesMode=!notesMode;
+  document.getElementById('notesBtn').classList.toggle('active', notesMode);
+  document.getElementById('notesSub').textContent = notesMode?'on':'off';
+});
+document.getElementById('eraseBtn').addEventListener('click', eraseCell);
+document.getElementById('undoBtn').addEventListener('click', undo);
+document.getElementById('hintBtn').addEventListener('click', useHint);
+
+// ---- Modals wiring ----
+const rulesOverlay=document.getElementById('rulesOverlay');
+const helpOverlay=document.getElementById('helpOverlay');
+const settingsOverlay=document.getElementById('settingsOverlay');
+const equipOverlay=document.getElementById('equipOverlay');
+const rankOverlay=document.getElementById('rankOverlay');
+const shopOverlay=document.getElementById('shopOverlay');
+function openModal(el){ ensureAudio(); playUIClick(); el.classList.remove('hidden'); }
+function closeModal(el){ playUIClick(); el.classList.add('hidden'); }
+[rulesOverlay,helpOverlay,settingsOverlay,equipOverlay,rankOverlay,shopOverlay].forEach(ov=>{
+  ov.addEventListener('click',(e)=>{ if(e.target===ov) closeModal(ov); });
+});
+document.getElementById('rulesBtn2').addEventListener('click',()=>openModal(rulesOverlay));
+document.getElementById('closeRulesBtn').addEventListener('click',()=>closeModal(rulesOverlay));
+document.getElementById('navHelp').addEventListener('click',()=>openModal(helpOverlay));
+document.getElementById('closeHelpBtn').addEventListener('click',()=>closeModal(helpOverlay));
+document.getElementById('navSettings').addEventListener('click',()=>openModal(settingsOverlay));
+document.getElementById('settingsBtn2').addEventListener('click',()=>openModal(settingsOverlay));
+document.getElementById('closeSettingsBtn').addEventListener('click',()=>{ closeModal(settingsOverlay); updateTrainerBadge(); });
+document.getElementById('navThemes').addEventListener('click',()=>{ openModal(equipOverlay); renderThemeTabs(); });
+document.getElementById('closeEquipBtn').addEventListener('click',()=>closeModal(equipOverlay));
+document.getElementById('navRank').addEventListener('click',()=>{ openModal(rankOverlay); renderRank(); });
+document.getElementById('closeRankBtn').addEventListener('click',()=>closeModal(rankOverlay));
+document.getElementById('navShop').addEventListener('click',()=>openModal(shopOverlay));
+document.getElementById('closeShopBtn').addEventListener('click',()=>closeModal(shopOverlay));
+
+document.getElementById('trainerToggleSettings').addEventListener('change', e=>{ settings.autoCheck=e.target.checked; updateTrainerBadge(); });
+document.getElementById('highlightToggleSettings').addEventListener('change', e=>{ settings.highlightSame=e.target.checked; refreshGridClasses(); });
+document.getElementById('muteAllChk').addEventListener('change', e=>{ ensureAudio(); muted=e.target.checked; setMuted(muted); document.getElementById('quickMuteBtn').textContent = muted?'🔇':'🔊'; });
+document.getElementById('adsFreeChk').addEventListener('change', e=>{ settings.adsFree=e.target.checked; });
+document.getElementById('musicToggle').addEventListener('change', e=>{ settings.music=e.target.checked; if(settings.music) startMusic(); else stopMusic(); });
+[['volMusic','music'],['volMaster','master'],['volPlace','place'],['volError','error'],['volComplete','complete'],['volUi','ui']].forEach(([id,key])=>{
+  document.getElementById(id).addEventListener('input', e=>{ const v=+e.target.value; document.getElementById('val'+key[0].toUpperCase()+key.slice(1)).textContent=v; setVol(key,v/100); });
+});
+
+// ---- Themes (Equip) ----
+document.querySelectorAll('#equipOverlay .tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    ensureAudio(); playUIClick();
+    document.querySelectorAll('#equipOverlay .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    ['Boards','Numbers','Highlight'].forEach(n=>document.getElementById('tab'+n).classList.add('hidden'));
+    const map={boards:'tabBoards', numbers:'tabNumbers', highlight:'tabHighlight'};
+    document.getElementById(map[tab.dataset.tab]).classList.remove('hidden');
+  });
+});
+function applyBoardTheme(){
+  const t=BOARD_THEMES[boardTheme];
+  document.documentElement.style.setProperty('--blue', t.a);
+  document.documentElement.style.setProperty('--magenta', t.b);
+}
+function applyHighlightTheme(){
+  const t=HIGHLIGHT_THEMES[highlightTheme];
+  document.documentElement.style.setProperty('--gold', t.c);
+}
+function renderThemeTabs(){
+  const bg=document.getElementById('boardThemeGrid'); bg.innerHTML='';
+  BOARD_THEMES.forEach((t,i)=>{
+    const sw=document.createElement('div'); sw.className='theme-swatch'+(i===boardTheme?' selected':'');
+    sw.innerHTML=`<div class="theme-dots"><span style="background:${t.a}"></span><span style="background:${t.b}"></span></div><div class="l">${t.name}</div>`;
+    sw.addEventListener('click', ()=>{ ensureAudio(); playUIClick(); boardTheme=i; applyBoardTheme(); renderThemeTabs(); });
+    bg.appendChild(sw);
+  });
+  const hg=document.getElementById('highlightThemeGrid'); hg.innerHTML='';
+  HIGHLIGHT_THEMES.forEach((t,i)=>{
+    const sw=document.createElement('div'); sw.className='theme-swatch'+(i===highlightTheme?' selected':'');
+    sw.innerHTML=`<div class="theme-dots"><span style="background:${t.c}"></span></div><div class="l">${t.name}</div>`;
+    sw.addEventListener('click', ()=>{ ensureAudio(); playUIClick(); highlightTheme=i; applyHighlightTheme(); renderThemeTabs(); });
+    hg.appendChild(sw);
+  });
+  const nl=document.getElementById('numberThemeList'); nl.innerHTML='';
+  NUMBER_THEMES.forEach((t,i)=>{
+    const owned = ownedNumberThemes.has(i);
+    const row=document.createElement('div'); row.className='striker-row'+(i===numberTheme?' equipped':'');
+    row.innerHTML=`<div class="striker-dot" style="background:${t.color}"></div><div class="striker-info"><div class="n">${t.name}</div><div class="r">${owned? (i===numberTheme?'Equipped':'Owned') : (t.price.toLocaleString()+' 🪙')}</div></div>`;
+    const btn=document.createElement('button'); btn.className='btn striker-action'; btn.textContent = owned? (i===numberTheme?'Equipped':'Equip') : 'Unlock';
+    btn.disabled = owned && i===numberTheme;
+    btn.addEventListener('click', ()=>{
+      ensureAudio(); playUIClick();
+      if(owned){ numberTheme=i; document.documentElement.style.setProperty('--blue-bright', t.color); renderThemeTabs(); }
+      else if(profile.coins>=t.price){ profile.coins-=t.price; ownedNumberThemes.add(i); updateCurrencyUI(); renderThemeTabs(); }
+      else showMsg('Not enough coins',1200);
+    });
+    row.appendChild(btn); nl.appendChild(row);
+  });
+}
+
+// ---- Rank ----
+function renderRank(){
+  const ladder=document.getElementById('rankLadder'); ladder.innerHTML='';
+  let curTier=RANK_TIERS[0];
+  for(let i=0;i<RANK_TIERS.length;i++) if(profile.lifetimeDiamonds>=RANK_TIERS[i].need) curTier=RANK_TIERS[i];
+  RANK_TIERS.forEach(t=>{
+    const row=document.createElement('div'); row.className='rank-tier'+(t.name===curTier.name?' current':'');
+    row.innerHTML=`<span>${t.icon}</span><span style="flex:1;">${t.name}</span><span style="opacity:0.6;font-family:'JetBrains Mono',monospace;">${t.need}+ 💎</span>`;
+    ladder.appendChild(row);
+  });
+  const list=document.getElementById('rankList'); list.innerHTML='';
+  const names=['Ravi','Aisha','Leo','Mei','Sofia','Tomas','Zara','Kwame','Noor','Ivan'];
+  const board=shuffled(names).slice(0,6).map(n=>({label:n, score:Math.floor(Math.random()*900)}));
+  board.push({label:profile.name+' (you)', score:profile.lifetimeDiamonds});
+  board.sort((a,b)=>b.score-a.score);
+  board.forEach((r,i)=>{
+    const row=document.createElement('div'); row.className='rank-row';
+    row.innerHTML=`<span class="r">#${i+1}</span><span style="flex:1;text-align:left;padding-left:8px;">${r.label}</span><span class="s">${r.score} 💎</span>`;
+    list.appendChild(row);
+  });
+}
+
+// ---- Shop ----
+document.getElementById('watchAdBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  document.getElementById('interstitialOverlay').classList.remove('hidden');
+  let n=5; const el=document.getElementById('adCountdown'); const skip=document.getElementById('adSkipBtn');
+  skip.disabled=true;
+  const iv=setInterval(()=>{ n--; el.textContent=n; if(n<=0){ clearInterval(iv); skip.disabled=false; } }, 1000);
+  skip.onclick=()=>{ document.getElementById('interstitialOverlay').classList.add('hidden'); profile.coins+=250; updateCurrencyUI(); showMsg('+250 🪙',1200); };
+});
+document.querySelectorAll('.buy-btn').forEach(b=>{
+  b.addEventListener('click', ()=>{ ensureAudio(); playUIClick(); showMsg('Needs a connected payment backend',1600); });
+});
+document.getElementById('subscribeAdFreeBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); showMsg('Needs a connected payment backend',1600); });
+
+// ---- Avatar / edit name ----
+const editNameOverlay=document.getElementById('editNameOverlay');
+const AVATAR_PRESETS=['🧑‍🎓','🧑‍🚀','🧑‍💻','🧠','🦉','🐺','🦊','🐯','🐼','🎯','🏆','🔥'];
+document.getElementById('avatarIcon').addEventListener('click', ()=>openEditName());
+document.getElementById('editNameBtn').addEventListener('click', ()=>openEditName());
+function openEditName(){
+  ensureAudio(); playUIClick();
+  document.getElementById('editNameInput').value=profile.name;
+  const grid=document.getElementById('avatarPresetGrid'); grid.innerHTML='';
+  AVATAR_PRESETS.forEach(a=>{
+    const d=document.createElement('div'); d.textContent=a; d.style.cssText='font-size:20px;text-align:center;padding:8px 0;border-radius:8px;cursor:pointer;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);';
+    d.addEventListener('click', ()=>{ profile.avatar=a; document.getElementById('avatarPreview').textContent=a; playUIClick(); });
+    grid.appendChild(d);
+  });
+  editNameOverlay.classList.remove('hidden');
+}
+document.getElementById('cancelNameBtn').addEventListener('click', ()=>{ playUIClick(); editNameOverlay.classList.add('hidden'); });
+document.getElementById('saveNameBtn').addEventListener('click', ()=>{
+  playUIClick();
+  const v=document.getElementById('editNameInput').value.trim();
+  if(v) profile.name=v;
+  updateProfileUI(); editNameOverlay.classList.add('hidden');
+});
+document.getElementById('uploadAvatarBtn').addEventListener('click', ()=>document.getElementById('avatarFileInput').click());
+document.getElementById('avatarFileInput').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{ document.getElementById('avatarPreview').innerHTML=`<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;">`; profile.avatar='IMG:'+ev.target.result; };
+  reader.readAsDataURL(f);
+});
+
+// ---- Daily streak ----
+let streakDay=1, streakClaimed=false;
+const streakOverlay=document.getElementById('streakOverlay');
+document.getElementById('dailyBonusCard').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); renderStreak(); streakOverlay.classList.remove('hidden'); });
+document.getElementById('closeStreakBtn').addEventListener('click', ()=>{ playUIClick(); streakOverlay.classList.add('hidden'); });
+function renderStreak(){
+  const grid=document.getElementById('streakGrid'); grid.innerHTML='';
+  const rewards=[50,80,120,160,220,300,500];
+  for(let d=1;d<=7;d++){
+    const cell=document.createElement('div');
+    cell.style.cssText='border-radius:10px;padding:10px 4px;text-align:center;font-size:10px;border:1px solid rgba(217,154,63,0.2);'+(d===streakDay?'border-color:var(--gold);background:rgba(255,210,63,0.12);':(d<streakDay?'opacity:0.4;':''));
+    cell.innerHTML=`Day ${d}<br><span style="font-family:'JetBrains Mono',monospace;font-size:12px;">${rewards[d-1]}🪙</span>`;
+    grid.appendChild(cell);
+  }
+  document.getElementById('claimStreakBtn').textContent = streakClaimed? 'Claimed — come back tomorrow' : `Claim Day ${streakDay}`;
+  document.getElementById('claimStreakBtn').disabled = streakClaimed;
+}
+document.getElementById('claimStreakBtn').addEventListener('click', ()=>{
+  if(streakClaimed) return;
+  ensureAudio(); playUIClick();
+  const rewards=[50,80,120,160,220,300,500];
+  profile.coins += rewards[streakDay-1]; updateCurrencyUI();
+  streakClaimed=true;
+  document.getElementById('dailyBonusDesc').textContent = `Day ${streakDay} claimed — back tomorrow`;
+  document.getElementById('dailyBonusTag').textContent='CLAIMED';
+  renderStreak();
+});
+
+// ---- Wager ----
+const wagerOverlay=document.getElementById('wagerOverlay');
+document.getElementById('wagerCard').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  document.getElementById('wagerBalanceTxt').textContent=profile.coins.toLocaleString();
+  syncWagerTexts();
+  wagerOverlay.classList.remove('hidden');
+});
+document.getElementById('cancelWagerBtn').addEventListener('click', ()=>{ playUIClick(); wagerOverlay.classList.add('hidden'); });
+function syncWagerTexts(){
+  document.getElementById('selectedStakeTxt').textContent=selectedStake.toLocaleString();
+  document.getElementById('winPaysTxt').textContent=(selectedStake*2).toLocaleString();
+}
+document.querySelectorAll('.stake-chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    ensureAudio(); playUIClick();
+    document.querySelectorAll('.stake-chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected'); selectedStake=+chip.dataset.stake; syncWagerTexts();
+  });
+});
+document.getElementById('allInBtn').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); selectedStake=Math.max(500,profile.coins); document.querySelectorAll('.stake-chip').forEach(c=>c.classList.remove('selected')); syncWagerTexts(); });
+document.getElementById('customStakeInput').addEventListener('input', e=>{ const v=+e.target.value; if(v>=500){ selectedStake=v; document.querySelectorAll('.stake-chip').forEach(c=>c.classList.remove('selected')); syncWagerTexts(); } });
+document.getElementById('findOpponentBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  if(selectedStake>profile.coins){ showMsg('Not enough coins for that stake',1400); return; }
+  wagerOverlay.classList.add('hidden');
+  const mo=document.getElementById('matchingOverlay');
+  document.getElementById('matchingText').textContent='Searching for an opponent…';
+  document.getElementById('matchingSub').textContent='Matching your stake';
+  mo.classList.remove('hidden');
+  setTimeout(()=>{
+    mo.classList.add('hidden');
+    wagerActive=true; wagerStake=selectedStake;
+    newGameSetup('wager', difficulty);
+  }, 1400);
+});
+
+// ---- Multiplayer / Lobby (preview only, honest placeholders) ----
+const multiplayerOverlay=document.getElementById('multiplayerOverlay');
+const lobbyOverlay=document.getElementById('lobbyOverlay');
+document.getElementById('onlineCard').addEventListener('click', ()=>{ ensureAudio(); playUIClick(); multiplayerOverlay.classList.remove('hidden'); });
+document.getElementById('closeMultiplayerBtn').addEventListener('click', ()=>{ playUIClick(); multiplayerOverlay.classList.add('hidden'); });
+document.getElementById('randomMatchBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  multiplayerOverlay.classList.add('hidden');
+  const mo=document.getElementById('matchingOverlay');
+  document.getElementById('matchingText').textContent='Searching for a real player…';
+  document.getElementById('matchingSub').textContent='No matchmaking server connected yet';
+  mo.classList.remove('hidden');
+  setTimeout(()=>{ mo.classList.add('hidden'); showMsg('No live opponents — this needs a matchmaking server', 2200); }, 1800);
+});
+document.getElementById('customRoomBtn').addEventListener('click', ()=>{
+  ensureAudio(); playUIClick();
+  multiplayerOverlay.classList.add('hidden');
+  document.getElementById('myPlayerId').textContent=profile.playerId;
+  renderLobby();
+  lobbyOverlay.classList.remove('hidden');
+});
+document.getElementById('closeLobbyBtn').addEventListener('click', ()=>{ playUIClick(); lobbyOverlay.classList.add('hidden'); });
+document.getElementById('copyIdBtn').addEventListener('click', ()=>{ playUIClick(); try{ navigator.clipboard.writeText(profile.playerId); showMsg('Copied',900); }catch(e){} });
+document.getElementById('sendInviteBtn').addEventListener('click', ()=>{ playUIClick(); showMsg('Needs a signaling server to deliver invites',1800); });
+function renderLobby(){
+  const slots=document.getElementById('lobbySlots'); slots.innerHTML='';
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(217,154,63,0.06);border:1px solid var(--panel-border);border-radius:8px;padding:8px 10px;';
+  row.innerHTML=`<div class="avatar" style="width:30px;height:30px;font-size:14px;">${profile.avatar}</div><div style="flex:1;text-align:left;font-size:12px;">${profile.name} (you)</div>`;
+  slots.appendChild(row);
+  document.getElementById('lobbyCount').textContent='1';
+}
+
+// ================= Boot =================
+applyBoardTheme(); applyHighlightTheme();
+updateProfileUI(); updateCurrencyUI();
+})();
+</script>
+</body>
+</html>
